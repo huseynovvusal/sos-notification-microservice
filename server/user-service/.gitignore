@@ -1,0 +1,60 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+*.out
+*.err
+
+# Build output
+dist/
+build/
+coverage/
+.tmp/
+temp/
+tmp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Test output
+jest-test-results.json
+
+# Misc
+*.swp
+*.bak
+*.orig
+*.rej
+
+# TypeScript
+*.tsbuildinfo
+
+# Docker
+docker-compose.override.yml
+
+# Optional: Ignore local database files
+*.sqlite
+*.db
+
+# Optional: Ignore custom config files
+config/local.json
+config/*.local.js
