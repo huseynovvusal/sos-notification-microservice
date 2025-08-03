@@ -3,7 +3,7 @@ export interface IUser {
   name: string;
   email: string;
   phone: string;
-  contacts: string[]; // Array of contact IDs
+  contacts: IUser[]; // Array of contact IDs
   createdAt: Date;
   updatedAt: Date;
 }
