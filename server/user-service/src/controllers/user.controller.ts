@@ -15,6 +15,7 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
   const createdUser = await user.save();
 
   res.status(StatusCodes.CREATED).json({
+    status: 'success',
     data: createdUser
   });
 });
