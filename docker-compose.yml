@@ -19,6 +19,10 @@ services:
     networks:
       - backend_network
 
+volumes:
+  mongo_data:
+    driver: local
+
 networks:
   backend_network:
     driver: bridge
