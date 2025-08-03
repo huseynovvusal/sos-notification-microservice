@@ -19,6 +19,15 @@ services:
     networks:
       - backend_network
 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq_container
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend_network
+
 volumes:
   mongo_data:
     driver: local
