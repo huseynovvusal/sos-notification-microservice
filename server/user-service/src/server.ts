@@ -1,10 +1,12 @@
 import express from 'express';
-import router from '@/routes';
 import mongoose from 'mongoose';
 import { Server } from 'http';
-import { connectDatabase } from './db/connection';
-import { config } from './config';
-import { errorHandler } from './middlewares/error-handler.middleware';
+
+import { config } from '@/config';
+import { connectDatabase } from '@/db/connection';
+import logger from '@/lib/logger';
+import router from '@/routes';
+import { errorHandler } from '@/middlewares/error-handler.middleware';
 
 let server: Server;
 const PORT = process.env.PORT || 3000;
@@ -29,7 +31,7 @@ async function initialize() {
   await connectDatabase(`${config.MONGO_URI}`);
 
   server = app.listen(PORT, () => {
-    console.log(`User service is running on PORT:${PORT}`);
+    logger.info(`User service is running on PORT:${PORT}`);
   });
 }
 
@@ -37,12 +39,12 @@ initialize();
 
 // Graceful shutdown
 async function shutdown() {
-  console.log('Shutting down user service...');
+  logger.info('Shutting down user service...');
 
   await mongoose.connection.close();
 
   server?.close(() => {
-    console.log('User service has shut down gracefully.');
+    logger.warn('User service has shut down gracefully.');
     process.exit(0);
   });
 }

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node -r tsconfig-paths/register src/server.ts"
+    "dev": "nodemon --watch src --exec ts-node -r tsconfig-paths/register src/server.ts | pino-pretty -c"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,8 @@
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
     "http-status-codes": "^2.3.0",
-    "mongoose": "^8.17.0"
+    "mongoose": "^8.17.0",
+    "pino-pretty": "^13.1.1",
+    "winston": "^3.17.0"
   }
 }
