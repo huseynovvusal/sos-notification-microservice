@@ -8,13 +8,13 @@ const UserSchema = new Schema<IUserDocument>(
     name: { type: String, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true },
-    contacts: { type: [String], required: true }
+    contacts: { type: [String], default: [] }
   },
   {
     timestamps: true
   }
 );
 
-const UserModel = mongoose.model<IUserDocument>('User', UserSchema);
+const User = mongoose.model<IUserDocument>('User', UserSchema);
 
-export default UserModel;
+export default User;
