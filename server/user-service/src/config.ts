@@ -1,7 +1,10 @@
 import dotenv from 'dotenv';
+import path from 'path';
+
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Load environment variables from .env file
-dotenv.config({ quiet: true });
+dotenv.config({ quiet: true, path: path.join(__dirname, `../.env${NODE_ENV === 'development' ? '.development' : ''}`) });
 
 export class Config {
   public NODE_ENV: string | undefined;
