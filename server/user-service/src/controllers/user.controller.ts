@@ -1,7 +1,8 @@
 import asyncHandler from 'express-async-handler';
-import User from '../models/user.model';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+
+import User from '@/models/user.model';
 
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, phone } = req.body;

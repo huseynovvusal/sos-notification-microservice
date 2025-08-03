@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/server.ts"
+    "dev": "nodemon --watch src --exec ts-node -r tsconfig-paths/register src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +15,9 @@
     "@types/node": "^24.1.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.2",
+    "typescript-transform-paths": "^3.5.5"
   },
   "dependencies": {
     "dotenv": "^17.2.1",
