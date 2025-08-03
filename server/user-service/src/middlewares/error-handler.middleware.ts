@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 
 export const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+  let statusCode = err.statusCode || 500;
+  let message = err.message || 'Internal Server Error';
+
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyValue)[0];
+    statusCode = 409;
+    message = `Duplicate value for field: ${field}`;
+  }
 
   res.status(statusCode).json({
     status: 'error',

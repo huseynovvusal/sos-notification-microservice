@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import { Server } from 'http';
 import { connectDatabase } from './db/connection';
 import { config } from './config';
+import { errorHandler } from './middlewares/error-handler.middleware';
 
 let server: Server;
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Router
 app.use('/api/users', router);
+
+// Error handler
+app.use(errorHandler);
 
 async function initialize() {
   await connectDatabase(`${config.MONGO_URI}`);
