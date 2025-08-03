@@ -58,3 +58,8 @@ docker-compose.override.yml
 # Optional: Ignore custom config files
 config/local.json
 config/*.local.js
+/src/generated/prisma
+
+/src/generated/prisma
+
+/generated/prisma
