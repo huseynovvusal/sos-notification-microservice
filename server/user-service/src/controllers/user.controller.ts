@@ -19,8 +19,8 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
   const createdUser = await user.save();
 
   res.status(StatusCodes.CREATED).json({
-    status: 'success',
-    data: createdUser
+    sucess: true,
+    user: createdUser
   });
 });
 
@@ -34,8 +34,8 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
   }
 
   res.status(200).json({
-    status: 'success',
-    data: user
+    success: true,
+    user: user
   });
 });
 
@@ -68,10 +68,8 @@ export const addContactToUser = asyncHandler(async (req: Request, res: Response)
   }
 
   res.status(200).json({
-    status: 'success',
-    data: {
-      user: updatedUser
-    }
+    success: true,
+    user: updatedUser
   });
 });
 
@@ -93,8 +91,6 @@ export const removeContactFromUser = asyncHandler(async (req: Request, res: Resp
 
   res.status(200).json({
     status: 'success',
-    data: {
-      user: updatedUser
-    }
+    user: updatedUser
   });
 });

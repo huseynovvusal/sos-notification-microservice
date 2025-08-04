@@ -16,6 +16,8 @@ export class Config {
   public JWT_SECRET: string | undefined;
   public JWT_EXPIRATION: string | undefined;
 
+  public USER_SERVICE_URL: string | undefined;
+
   constructor() {
     this.NODE_ENV = process.env.NODE_ENV;
     this.PORT = Number(process.env.PORT);
@@ -26,6 +28,8 @@ export class Config {
 
     this.JWT_SECRET = process.env.JWT_SECRET;
     this.JWT_EXPIRATION = process.env.JWT_EXPIRATION;
+
+    this.USER_SERVICE_URL = process.env.USER_SERVICE_URL;
   }
 }
 
