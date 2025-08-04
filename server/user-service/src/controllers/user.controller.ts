@@ -39,9 +39,14 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+// TODO: User details including id and email will be provided inside the user property of the request parameter.
 export const addContactToUser = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
   const { contactEmail } = req.body;
+
+  if (!contactEmail) {
+    throw new BadRequestError('Contact email is required');
+  }
 
   // ! Validate that contactEmail is provided
   logger.debug(`Adding contact with email ${contactEmail} to user with ID ${userId}`);
@@ -70,6 +75,7 @@ export const addContactToUser = asyncHandler(async (req: Request, res: Response)
   });
 });
 
+// TODO: User details including id and email will be provided inside the user property of the request parameter.
 export const removeContactFromUser = asyncHandler(async (req: Request, res: Response) => {
   const { userId, contactEmail } = req.params;
 
