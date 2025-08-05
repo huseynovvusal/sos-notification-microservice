@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 import { IUser } from '@/interfaces/user.interface';
 
@@ -17,7 +18,8 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       required: [true, 'Email is required'],
       unique: true,
-      match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid email format']
+      match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid email format'],
+      index: true
     },
     password: {
       type: String,
@@ -33,9 +35,27 @@ const UserSchema = new Schema<IUserDocument>(
     contacts: { type: [mongoose.Types.ObjectId], ref: 'User' }
   },
   {
-    timestamps: true
+    timestamps: true,
+    versionKey: false
   }
 );
+
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model<IUserDocument>('User', UserSchema);
 

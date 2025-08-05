@@ -1,7 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 
 import logger from '@/lib/logger';
@@ -14,14 +13,11 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   const createUserApiUrl = `${config.USER_SERVICE_URL}/api/users`;
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
   const response = await axios.post(createUserApiUrl, {
     name,
     email,
     phone,
-    password: hashedPassword
+    password
   });
 
   const status = response.status;
