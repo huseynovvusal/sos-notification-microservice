@@ -2,8 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { Server } from 'http';
 
-import { config } from '@/config';
-import { connectDatabase } from '@/db/connection';
 import logger from '@/lib/logger';
 import router from '@/routes';
 import { errorHandler } from '@/middlewares/error-handler.middleware';
@@ -28,8 +26,6 @@ app.use('/api/auth', router);
 app.use(errorHandler);
 
 async function initialize() {
-  await connectDatabase(`${config.MONGO_URI}`);
-
   server = app.listen(PORT, () => {
     logger.info(`Auth service is running on PORT:${PORT}`);
   });

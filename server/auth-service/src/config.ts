@@ -11,8 +11,6 @@ export class Config {
   public PORT: number | undefined;
   public LOG_LEVEL: string | undefined;
 
-  public MONGO_URI: string | undefined;
-
   public JWT_SECRET: string | undefined;
   public JWT_EXPIRATION: string | undefined;
 
@@ -23,8 +21,6 @@ export class Config {
     this.PORT = Number(process.env.PORT);
 
     this.LOG_LEVEL = process.env.LOG_LEVEL;
-
-    this.MONGO_URI = process.env.MONGO_URI;
 
     this.JWT_SECRET = process.env.JWT_SECRET;
     this.JWT_EXPIRATION = process.env.JWT_EXPIRATION;
