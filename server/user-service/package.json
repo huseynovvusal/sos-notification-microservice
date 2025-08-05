@@ -20,7 +20,6 @@
     "typescript-transform-paths": "^3.5.5"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",

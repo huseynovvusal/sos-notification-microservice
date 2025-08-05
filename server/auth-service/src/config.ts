@@ -14,6 +14,8 @@ export class Config {
   public JWT_SECRET: string | undefined;
   public JWT_EXPIRATION: string | undefined;
 
+  public MONGO_URI: string | undefined;
+
   public USER_SERVICE_URL: string | undefined;
 
   constructor() {
@@ -24,6 +26,8 @@ export class Config {
 
     this.JWT_SECRET = process.env.JWT_SECRET;
     this.JWT_EXPIRATION = process.env.JWT_EXPIRATION;
+
+    this.MONGO_URI = process.env.MONGO_URI;
 
     this.USER_SERVICE_URL = process.env.USER_SERVICE_URL;
   }
