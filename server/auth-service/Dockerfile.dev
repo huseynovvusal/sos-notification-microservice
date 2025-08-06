@@ -1,0 +1,14 @@
+FROM node:alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY tsconfig.json ./
+
+RUN npm install && npm install -g nodemon
+
+COPY . .
+
+EXPOSE 3002
+
+CMD [ "npm", "run", "dev" ]
