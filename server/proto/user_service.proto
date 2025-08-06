@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+
+    rpc GetUserById(GetUserByIdRequest) returns (GetUserResponse);
+
+    rpc AddContactToUser(AddContactRequest) returns (UserResponse);
+
+    rpc RemoveContactFromUser(RemoveContactRequest) returns (UserResponse);
+}
+
+message CreateUserRequest {
+    string name = 1;
+    string email = 2;
+    string phone = 3;
+    string password = 4;
+}
+
+message CreateUserResponse {
+    UserMessage user = 1;
+}
+
+message GetUserByIdRequest {
+    string id = 1;
+}
+
+message GetUserResponse {
+    UserMessage user = 1;
+}
+
+message AddContactRequest {
+    string userId = 1;
+    string contactsEmail = 2;
+}
+
+message RemoveContactRequest {
+  string userId = 1;
+  string contactEmail = 2;
+}
+
+message UserResponse {
+  bool success = 1;
+  UserMessage user = 2;
+}
+
+message UserMessage {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string phone = 4;
+    repeated string contacts = 5;
+    string created_at = 6;
+    string updated_at = 7;
+}
