@@ -1,15 +1,18 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { Server } from 'http';
+// import { Server } from 'http';
+import * as grpc from '@grpc/grpc-js';
 
 import { config } from '@/config';
 import { connectDatabase } from '@/db/connection';
 import logger from '@/lib/logger';
 import router from '@/routes';
 import { errorHandler } from '@/middlewares/error-handler.middleware';
+import { UserServiceService } from './generated/user_service';
+import { userServiceImplementation } from './grpc/user-service';
 
-let server: Server;
-const PORT = process.env.PORT || 3000;
+// let server: Server;
+// const PORT = process.env.PORT || 3000;
 
 const app = express();
 
@@ -27,12 +30,41 @@ app.use('/api/users', router);
 // Error handler
 app.use(errorHandler);
 
+const grpcServer = new grpc.Server();
+
+function setupGrpcServer(): grpc.Server {
+  grpcServer.addService(UserServiceService, userServiceImplementation);
+
+  const grpcHost = config.GRPC_HOST;
+  const grpcPort = config.GRPC_PORT;
+
+  if (!grpcHost || !grpcPort) {
+    throw new Error('GRPC_HOST and GRPC_PORT must be defined in the environment variables');
+  }
+
+  const grpcAddress = `${grpcHost}:${grpcPort}`;
+
+  grpcServer.bindAsync(grpcAddress, grpc.ServerCredentials.createInsecure(), (err, _port) => {
+    if (err) {
+      logger.error(`Failed to bind gRPC server: ${err.message}`);
+      throw err;
+    }
+
+    grpcServer.start();
+    logger.info(`gRPC server is running on ${grpcAddress}`);
+  });
+
+  return grpcServer;
+}
+
 async function initialize() {
   await connectDatabase(`${config.MONGO_URI}`);
 
-  server = app.listen(PORT, () => {
-    logger.info(`User service is running on PORT:${PORT}`);
-  });
+  setupGrpcServer();
+
+  // server = app.listen(PORT, () => {
+  //   logger.info(`User service is running on PORT:${PORT}`);
+  // });
 }
 
 initialize();
@@ -43,10 +75,12 @@ async function shutdown() {
 
   await mongoose.connection.close();
 
-  server?.close(() => {
-    logger.warn('User service has shut down gracefully.');
-    process.exit(0);
-  });
+  grpcServer.forceShutdown();
+
+  // server?.close(() => {
+  //   logger.warn('User service has shut down gracefully.');
+  //   process.exit(0);
+  // });
 }
 
 process.on('SIGINT', shutdown);

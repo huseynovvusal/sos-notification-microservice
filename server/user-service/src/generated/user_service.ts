@@ -19,13 +19,12 @@ import {
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
 
-export const protobufPackage = "";
+export const protobufPackage = "user_service";
 
 export interface CreateUserRequest {
   name: string;
   email: string;
   phone: string;
-  password: string;
 }
 
 export interface CreateUserResponse {
@@ -66,7 +65,7 @@ export interface UserMessage {
 }
 
 function createBaseCreateUserRequest(): CreateUserRequest {
-  return { name: "", email: "", phone: "", password: "" };
+  return { name: "", email: "", phone: "" };
 }
 
 export const CreateUserRequest: MessageFns<CreateUserRequest> = {
@@ -79,9 +78,6 @@ export const CreateUserRequest: MessageFns<CreateUserRequest> = {
     }
     if (message.phone !== "") {
       writer.uint32(26).string(message.phone);
-    }
-    if (message.password !== "") {
-      writer.uint32(34).string(message.password);
     }
     return writer;
   },
@@ -117,14 +113,6 @@ export const CreateUserRequest: MessageFns<CreateUserRequest> = {
           message.phone = reader.string();
           continue;
         }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
-
-          message.password = reader.string();
-          continue;
-        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -139,7 +127,6 @@ export const CreateUserRequest: MessageFns<CreateUserRequest> = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       phone: isSet(object.phone) ? globalThis.String(object.phone) : "",
-      password: isSet(object.password) ? globalThis.String(object.password) : "",
     };
   },
 
@@ -154,9 +141,6 @@ export const CreateUserRequest: MessageFns<CreateUserRequest> = {
     if (message.phone !== "") {
       obj.phone = message.phone;
     }
-    if (message.password !== "") {
-      obj.password = message.password;
-    }
     return obj;
   },
 
@@ -168,7 +152,6 @@ export const CreateUserRequest: MessageFns<CreateUserRequest> = {
     message.name = object.name ?? "";
     message.email = object.email ?? "";
     message.phone = object.phone ?? "";
-    message.password = object.password ?? "";
     return message;
   },
 };
@@ -740,7 +723,7 @@ export const UserMessage: MessageFns<UserMessage> = {
 export type UserServiceService = typeof UserServiceService;
 export const UserServiceService = {
   createUser: {
-    path: "/UserService/CreateUser",
+    path: "/user_service.UserService/CreateUser",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateUserRequest): Buffer => Buffer.from(CreateUserRequest.encode(value).finish()),
@@ -749,7 +732,7 @@ export const UserServiceService = {
     responseDeserialize: (value: Buffer): CreateUserResponse => CreateUserResponse.decode(value),
   },
   getUserById: {
-    path: "/UserService/GetUserById",
+    path: "/user_service.UserService/GetUserById",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetUserByIdRequest): Buffer => Buffer.from(GetUserByIdRequest.encode(value).finish()),
@@ -757,31 +740,11 @@ export const UserServiceService = {
     responseSerialize: (value: GetUserResponse): Buffer => Buffer.from(GetUserResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): GetUserResponse => GetUserResponse.decode(value),
   },
-  addContactToUser: {
-    path: "/UserService/AddContactToUser",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: AddContactRequest): Buffer => Buffer.from(AddContactRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): AddContactRequest => AddContactRequest.decode(value),
-    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
-  },
-  removeContactFromUser: {
-    path: "/UserService/RemoveContactFromUser",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: RemoveContactRequest): Buffer => Buffer.from(RemoveContactRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): RemoveContactRequest => RemoveContactRequest.decode(value),
-    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
-  },
 } as const;
 
 export interface UserServiceServer extends UntypedServiceImplementation {
   createUser: handleUnaryCall<CreateUserRequest, CreateUserResponse>;
   getUserById: handleUnaryCall<GetUserByIdRequest, GetUserResponse>;
-  addContactToUser: handleUnaryCall<AddContactRequest, UserResponse>;
-  removeContactFromUser: handleUnaryCall<RemoveContactRequest, UserResponse>;
 }
 
 export interface UserServiceClient extends Client {
@@ -815,39 +778,12 @@ export interface UserServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: GetUserResponse) => void,
   ): ClientUnaryCall;
-  addContactToUser(
-    request: AddContactRequest,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
-  ): ClientUnaryCall;
-  addContactToUser(
-    request: AddContactRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
-  ): ClientUnaryCall;
-  addContactToUser(
-    request: AddContactRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
-  ): ClientUnaryCall;
-  removeContactFromUser(
-    request: RemoveContactRequest,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
-  ): ClientUnaryCall;
-  removeContactFromUser(
-    request: RemoveContactRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
-  ): ClientUnaryCall;
-  removeContactFromUser(
-    request: RemoveContactRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
-  ): ClientUnaryCall;
 }
 
-export const UserServiceClient = makeGenericClientConstructor(UserServiceService, "UserService") as unknown as {
+export const UserServiceClient = makeGenericClientConstructor(
+  UserServiceService,
+  "user_service.UserService",
+) as unknown as {
   new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): UserServiceClient;
   service: typeof UserServiceService;
   serviceName: string;

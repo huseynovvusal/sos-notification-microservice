@@ -1,20 +1,21 @@
 syntax = "proto3";
 
+package user_service;
+
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
 
     rpc GetUserById(GetUserByIdRequest) returns (GetUserResponse);
 
-    rpc AddContactToUser(AddContactRequest) returns (UserResponse);
+    // rpc AddContactToUser(AddContactRequest) returns (UserResponse);
 
-    rpc RemoveContactFromUser(RemoveContactRequest) returns (UserResponse);
+    // rpc RemoveContactFromUser(RemoveContactRequest) returns (UserResponse);
 }
 
 message CreateUserRequest {
     string name = 1;
     string email = 2;
     string phone = 3;
-    string password = 4;
 }
 
 message CreateUserResponse {
