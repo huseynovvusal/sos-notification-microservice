@@ -9,7 +9,7 @@ import logger from '@/lib/logger';
 import router from '@/routes';
 import { errorHandler } from '@/middlewares/error-handler.middleware';
 import { UserServiceService } from './generated/user_service';
-import { userServiceImplementation } from './grpc/user-service';
+import { userServiceImplementation } from './grpc/user-service-impl';
 
 // let server: Server;
 // const PORT = process.env.PORT || 3000;

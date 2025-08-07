@@ -50,7 +50,14 @@ message UserMessage {
     string name = 2;
     string email = 3;
     string phone = 4;
-    repeated string contacts = 5;
+    repeated ContactMessage contacts = 5;
     string created_at = 6;
     string updated_at = 7;
+}
+
+message ContactMessage {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string phone = 4;
 }

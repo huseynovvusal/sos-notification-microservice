@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 import { IUser } from '@/interfaces/user.interface';
 
-interface IUserDocument extends Omit<IUser, 'id'>, Document {}
+export interface IUserDocument extends Omit<IUser, 'id'>, Document {}
 
 const UserSchema = new Schema<IUserDocument>(
   {

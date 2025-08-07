@@ -59,9 +59,16 @@ export interface UserMessage {
   name: string;
   email: string;
   phone: string;
-  contacts: string[];
+  contacts: ContactMessage[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
 }
 
 function createBaseCreateUserRequest(): CreateUserRequest {
@@ -583,7 +590,7 @@ export const UserMessage: MessageFns<UserMessage> = {
       writer.uint32(34).string(message.phone);
     }
     for (const v of message.contacts) {
-      writer.uint32(42).string(v!);
+      ContactMessage.encode(v!, writer.uint32(42).fork()).join();
     }
     if (message.createdAt !== "") {
       writer.uint32(50).string(message.createdAt);
@@ -638,7 +645,7 @@ export const UserMessage: MessageFns<UserMessage> = {
             break;
           }
 
-          message.contacts.push(reader.string());
+          message.contacts.push(ContactMessage.decode(reader, reader.uint32()));
           continue;
         }
         case 6: {
@@ -672,7 +679,9 @@ export const UserMessage: MessageFns<UserMessage> = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       phone: isSet(object.phone) ? globalThis.String(object.phone) : "",
-      contacts: globalThis.Array.isArray(object?.contacts) ? object.contacts.map((e: any) => globalThis.String(e)) : [],
+      contacts: globalThis.Array.isArray(object?.contacts)
+        ? object.contacts.map((e: any) => ContactMessage.fromJSON(e))
+        : [],
       createdAt: isSet(object.createdAt) ? globalThis.String(object.createdAt) : "",
       updatedAt: isSet(object.updatedAt) ? globalThis.String(object.updatedAt) : "",
     };
@@ -693,7 +702,7 @@ export const UserMessage: MessageFns<UserMessage> = {
       obj.phone = message.phone;
     }
     if (message.contacts?.length) {
-      obj.contacts = message.contacts;
+      obj.contacts = message.contacts.map((e) => ContactMessage.toJSON(e));
     }
     if (message.createdAt !== "") {
       obj.createdAt = message.createdAt;
@@ -713,9 +722,117 @@ export const UserMessage: MessageFns<UserMessage> = {
     message.name = object.name ?? "";
     message.email = object.email ?? "";
     message.phone = object.phone ?? "";
-    message.contacts = object.contacts?.map((e) => e) || [];
+    message.contacts = object.contacts?.map((e) => ContactMessage.fromPartial(e)) || [];
     message.createdAt = object.createdAt ?? "";
     message.updatedAt = object.updatedAt ?? "";
+    return message;
+  },
+};
+
+function createBaseContactMessage(): ContactMessage {
+  return { id: "", name: "", email: "", phone: "" };
+}
+
+export const ContactMessage: MessageFns<ContactMessage> = {
+  encode(message: ContactMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.email !== "") {
+      writer.uint32(26).string(message.email);
+    }
+    if (message.phone !== "") {
+      writer.uint32(34).string(message.phone);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ContactMessage {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseContactMessage();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.phone = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ContactMessage {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+      phone: isSet(object.phone) ? globalThis.String(object.phone) : "",
+    };
+  },
+
+  toJSON(message: ContactMessage): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    if (message.phone !== "") {
+      obj.phone = message.phone;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ContactMessage>, I>>(base?: I): ContactMessage {
+    return ContactMessage.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ContactMessage>, I>>(object: I): ContactMessage {
+    const message = createBaseContactMessage();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.email = object.email ?? "";
+    message.phone = object.phone ?? "";
     return message;
   },
 };
