@@ -7,9 +7,9 @@ service UserService {
 
     rpc GetUserById(GetUserByIdRequest) returns (GetUserResponse);
 
-    // rpc AddContactToUser(AddContactRequest) returns (UserResponse);
+    rpc AddContactToUser(AddContactRequest) returns (UserResponse);
 
-    // rpc RemoveContactFromUser(RemoveContactRequest) returns (UserResponse);
+    rpc RemoveContactFromUser(RemoveContactRequest) returns (UserResponse);
 }
 
 message CreateUserRequest {
@@ -32,7 +32,7 @@ message GetUserResponse {
 
 message AddContactRequest {
     string userId = 1;
-    string contactsEmail = 2;
+    string contactEmail = 2;
 }
 
 message RemoveContactRequest {
@@ -41,7 +41,6 @@ message RemoveContactRequest {
 }
 
 message UserResponse {
-  bool success = 1;
   UserMessage user = 2;
 }
 

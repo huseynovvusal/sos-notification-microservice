@@ -41,7 +41,7 @@ export interface GetUserResponse {
 
 export interface AddContactRequest {
   userId: string;
-  contactsEmail: string;
+  contactEmail: string;
 }
 
 export interface RemoveContactRequest {
@@ -50,7 +50,6 @@ export interface RemoveContactRequest {
 }
 
 export interface UserResponse {
-  success: boolean;
   user: UserMessage | undefined;
 }
 
@@ -342,7 +341,7 @@ export const GetUserResponse: MessageFns<GetUserResponse> = {
 };
 
 function createBaseAddContactRequest(): AddContactRequest {
-  return { userId: "", contactsEmail: "" };
+  return { userId: "", contactEmail: "" };
 }
 
 export const AddContactRequest: MessageFns<AddContactRequest> = {
@@ -350,8 +349,8 @@ export const AddContactRequest: MessageFns<AddContactRequest> = {
     if (message.userId !== "") {
       writer.uint32(10).string(message.userId);
     }
-    if (message.contactsEmail !== "") {
-      writer.uint32(18).string(message.contactsEmail);
+    if (message.contactEmail !== "") {
+      writer.uint32(18).string(message.contactEmail);
     }
     return writer;
   },
@@ -376,7 +375,7 @@ export const AddContactRequest: MessageFns<AddContactRequest> = {
             break;
           }
 
-          message.contactsEmail = reader.string();
+          message.contactEmail = reader.string();
           continue;
         }
       }
@@ -391,7 +390,7 @@ export const AddContactRequest: MessageFns<AddContactRequest> = {
   fromJSON(object: any): AddContactRequest {
     return {
       userId: isSet(object.userId) ? globalThis.String(object.userId) : "",
-      contactsEmail: isSet(object.contactsEmail) ? globalThis.String(object.contactsEmail) : "",
+      contactEmail: isSet(object.contactEmail) ? globalThis.String(object.contactEmail) : "",
     };
   },
 
@@ -400,8 +399,8 @@ export const AddContactRequest: MessageFns<AddContactRequest> = {
     if (message.userId !== "") {
       obj.userId = message.userId;
     }
-    if (message.contactsEmail !== "") {
-      obj.contactsEmail = message.contactsEmail;
+    if (message.contactEmail !== "") {
+      obj.contactEmail = message.contactEmail;
     }
     return obj;
   },
@@ -412,7 +411,7 @@ export const AddContactRequest: MessageFns<AddContactRequest> = {
   fromPartial<I extends Exact<DeepPartial<AddContactRequest>, I>>(object: I): AddContactRequest {
     const message = createBaseAddContactRequest();
     message.userId = object.userId ?? "";
-    message.contactsEmail = object.contactsEmail ?? "";
+    message.contactEmail = object.contactEmail ?? "";
     return message;
   },
 };
@@ -494,14 +493,11 @@ export const RemoveContactRequest: MessageFns<RemoveContactRequest> = {
 };
 
 function createBaseUserResponse(): UserResponse {
-  return { success: false, user: undefined };
+  return { user: undefined };
 }
 
 export const UserResponse: MessageFns<UserResponse> = {
   encode(message: UserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.success !== false) {
-      writer.uint32(8).bool(message.success);
-    }
     if (message.user !== undefined) {
       UserMessage.encode(message.user, writer.uint32(18).fork()).join();
     }
@@ -515,14 +511,6 @@ export const UserResponse: MessageFns<UserResponse> = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
-
-          message.success = reader.bool();
-          continue;
-        }
         case 2: {
           if (tag !== 18) {
             break;
@@ -541,17 +529,11 @@ export const UserResponse: MessageFns<UserResponse> = {
   },
 
   fromJSON(object: any): UserResponse {
-    return {
-      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-      user: isSet(object.user) ? UserMessage.fromJSON(object.user) : undefined,
-    };
+    return { user: isSet(object.user) ? UserMessage.fromJSON(object.user) : undefined };
   },
 
   toJSON(message: UserResponse): unknown {
     const obj: any = {};
-    if (message.success !== false) {
-      obj.success = message.success;
-    }
     if (message.user !== undefined) {
       obj.user = UserMessage.toJSON(message.user);
     }
@@ -563,7 +545,6 @@ export const UserResponse: MessageFns<UserResponse> = {
   },
   fromPartial<I extends Exact<DeepPartial<UserResponse>, I>>(object: I): UserResponse {
     const message = createBaseUserResponse();
-    message.success = object.success ?? false;
     message.user = (object.user !== undefined && object.user !== null)
       ? UserMessage.fromPartial(object.user)
       : undefined;
@@ -857,11 +838,31 @@ export const UserServiceService = {
     responseSerialize: (value: GetUserResponse): Buffer => Buffer.from(GetUserResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): GetUserResponse => GetUserResponse.decode(value),
   },
+  addContactToUser: {
+    path: "/user_service.UserService/AddContactToUser",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: AddContactRequest): Buffer => Buffer.from(AddContactRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): AddContactRequest => AddContactRequest.decode(value),
+    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
+  },
+  removeContactFromUser: {
+    path: "/user_service.UserService/RemoveContactFromUser",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: RemoveContactRequest): Buffer => Buffer.from(RemoveContactRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): RemoveContactRequest => RemoveContactRequest.decode(value),
+    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
+  },
 } as const;
 
 export interface UserServiceServer extends UntypedServiceImplementation {
   createUser: handleUnaryCall<CreateUserRequest, CreateUserResponse>;
   getUserById: handleUnaryCall<GetUserByIdRequest, GetUserResponse>;
+  addContactToUser: handleUnaryCall<AddContactRequest, UserResponse>;
+  removeContactFromUser: handleUnaryCall<RemoveContactRequest, UserResponse>;
 }
 
 export interface UserServiceClient extends Client {
@@ -894,6 +895,36 @@ export interface UserServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: GetUserResponse) => void,
+  ): ClientUnaryCall;
+  addContactToUser(
+    request: AddContactRequest,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  addContactToUser(
+    request: AddContactRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  addContactToUser(
+    request: AddContactRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  removeContactFromUser(
+    request: RemoveContactRequest,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  removeContactFromUser(
+    request: RemoveContactRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  removeContactFromUser(
+    request: RemoveContactRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
   ): ClientUnaryCall;
 }
 

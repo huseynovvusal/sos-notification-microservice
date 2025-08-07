@@ -27,7 +27,6 @@ function setupGrpcServer(): grpc.Server {
       throw err;
     }
 
-    grpcServer.start();
     logger.info(`gRPC server is running on ${grpcAddress}`);
   });
 
