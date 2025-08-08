@@ -1,6 +1,6 @@
 import * as grpc from '@grpc/grpc-js';
 
-import { userService } from '@/grpc/services/user.service';
+import { userService } from '@/grpc/user-service';
 
 export const userServiceImplementation: grpc.UntypedServiceImplementation = {
   createUser: userService.createUser.bind(userService),
