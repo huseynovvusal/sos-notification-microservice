@@ -93,7 +93,7 @@ export class UserService {
         });
       }
 
-      logger.debug(`Adding contact with email ${request.contactEmail} to user with ID ${request.userId}`);
+      logger.info(`Adding contact with email ${request.contactEmail} to user with ID ${request.userId}`);
 
       const contact = await User.findOne({ email: request.contactEmail });
 
@@ -151,7 +151,7 @@ export class UserService {
         });
       }
 
-      logger.debug(`Removing contact with email ${request.contactEmail} from user with ID ${request.userId}`);
+      logger.info(`Removing contact with email ${request.contactEmail} from user with ID ${request.userId}`);
 
       const contact = await User.findOne({ email: request.contactEmail });
 
