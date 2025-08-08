@@ -1,38 +1,42 @@
-import express from 'express';
+import * as grpc from '@grpc/grpc-js';
 import mongoose from 'mongoose';
-import { Server } from 'http';
 
 import logger from '@/lib/logger';
-import router from '@/routes';
-import { errorHandler } from '@/middlewares/error-handler.middleware';
 import { connectDatabase } from './db/connection';
 import { config } from './config';
+import { AuthServiceService } from './generated/auth_service';
+import { authServiceImplementation } from './grpc/auth-service-impl';
 
-let server: Server;
-const PORT = process.env.PORT || 3000;
+const grpcServer = new grpc.Server();
 
-const app = express();
+function setupGrpcServer(): grpc.Server {
+  grpcServer.addService(AuthServiceService, authServiceImplementation);
 
-app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
+  const grpcHost = config.GRPC_HOST;
+  const grpcPort = config.GRPC_PORT;
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+  if (!grpcHost || !grpcPort) {
+    throw new Error('GRPC_HOST and GRPC_PORT must be defined in the environment variables');
+  }
 
-// Router
-app.use('/api/auth', router);
+  const grpcAddress = `${grpcHost}:${grpcPort}`;
 
-// Error handler
-app.use(errorHandler);
+  grpcServer.bindAsync(grpcAddress, grpc.ServerCredentials.createInsecure(), (err, _port) => {
+    if (err) {
+      logger.error(`Failed to bind gRPC server: ${err.message}`);
+      throw err;
+    }
+
+    logger.info(`gRPC server is running on ${grpcAddress}`);
+  });
+
+  return grpcServer;
+}
 
 async function initialize() {
   await connectDatabase(config.MONGO_URI!);
 
-  server = app.listen(PORT, () => {
-    logger.info(`Auth service is running on PORT:${PORT}`);
-  });
+  setupGrpcServer();
 }
 
 initialize();
@@ -43,10 +47,7 @@ async function shutdown() {
 
   await mongoose.connection.close();
 
-  server?.close(() => {
-    logger.warn('Auth service has shut down gracefully.');
-    process.exit(0);
-  });
+  grpcServer?.forceShutdown();
 }
 
 process.on('SIGINT', shutdown);
