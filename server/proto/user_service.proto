@@ -2,14 +2,16 @@ syntax = "proto3";
 
 package user_service;
 
+import "google/protobuf/timestamp.proto";
+
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
 
     rpc GetUserById(GetUserByIdRequest) returns (GetUserResponse);
 
-    rpc AddContactToUser(AddContactRequest) returns (UserResponse);
+    rpc AddContactToUser(AddContactRequest) returns (AddContactResponse);
 
-    rpc RemoveContactFromUser(RemoveContactRequest) returns (UserResponse);
+    rpc RemoveContactFromUser(RemoveContactRequest) returns (RemoveContactResponse);
 }
 
 message CreateUserRequest {
@@ -23,7 +25,7 @@ message CreateUserResponse {
 }
 
 message GetUserByIdRequest {
-    string id = 1;
+    string userId = 1;
 }
 
 message GetUserResponse {
@@ -35,13 +37,17 @@ message AddContactRequest {
     string contactEmail = 2;
 }
 
+message AddContactResponse {
+    UserMessage user = 1;
+}
+
 message RemoveContactRequest {
   string userId = 1;
   string contactEmail = 2;
 }
 
-message UserResponse {
-  UserMessage user = 2;
+message RemoveContactResponse {
+    UserMessage user = 1;
 }
 
 message UserMessage {
@@ -50,8 +56,8 @@ message UserMessage {
     string email = 3;
     string phone = 4;
     repeated ContactMessage contacts = 5;
-    string created_at = 6;
-    string updated_at = 7;
+    google.protobuf.Timestamp createdAt = 6;
+    google.protobuf.Timestamp updatedAt = 7;
 }
 
 message ContactMessage {

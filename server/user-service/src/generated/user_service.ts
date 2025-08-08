@@ -18,6 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
+import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "user_service";
 
@@ -32,7 +33,7 @@ export interface CreateUserResponse {
 }
 
 export interface GetUserByIdRequest {
-  id: string;
+  userId: string;
 }
 
 export interface GetUserResponse {
@@ -44,12 +45,16 @@ export interface AddContactRequest {
   contactEmail: string;
 }
 
+export interface AddContactResponse {
+  user: UserMessage | undefined;
+}
+
 export interface RemoveContactRequest {
   userId: string;
   contactEmail: string;
 }
 
-export interface UserResponse {
+export interface RemoveContactResponse {
   user: UserMessage | undefined;
 }
 
@@ -59,8 +64,8 @@ export interface UserMessage {
   email: string;
   phone: string;
   contacts: ContactMessage[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date | undefined;
+  updatedAt: Date | undefined;
 }
 
 export interface ContactMessage {
@@ -223,13 +228,13 @@ export const CreateUserResponse: MessageFns<CreateUserResponse> = {
 };
 
 function createBaseGetUserByIdRequest(): GetUserByIdRequest {
-  return { id: "" };
+  return { userId: "" };
 }
 
 export const GetUserByIdRequest: MessageFns<GetUserByIdRequest> = {
   encode(message: GetUserByIdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
+    if (message.userId !== "") {
+      writer.uint32(10).string(message.userId);
     }
     return writer;
   },
@@ -246,7 +251,7 @@ export const GetUserByIdRequest: MessageFns<GetUserByIdRequest> = {
             break;
           }
 
-          message.id = reader.string();
+          message.userId = reader.string();
           continue;
         }
       }
@@ -259,13 +264,13 @@ export const GetUserByIdRequest: MessageFns<GetUserByIdRequest> = {
   },
 
   fromJSON(object: any): GetUserByIdRequest {
-    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+    return { userId: isSet(object.userId) ? globalThis.String(object.userId) : "" };
   },
 
   toJSON(message: GetUserByIdRequest): unknown {
     const obj: any = {};
-    if (message.id !== "") {
-      obj.id = message.id;
+    if (message.userId !== "") {
+      obj.userId = message.userId;
     }
     return obj;
   },
@@ -275,7 +280,7 @@ export const GetUserByIdRequest: MessageFns<GetUserByIdRequest> = {
   },
   fromPartial<I extends Exact<DeepPartial<GetUserByIdRequest>, I>>(object: I): GetUserByIdRequest {
     const message = createBaseGetUserByIdRequest();
-    message.id = object.id ?? "";
+    message.userId = object.userId ?? "";
     return message;
   },
 };
@@ -416,6 +421,66 @@ export const AddContactRequest: MessageFns<AddContactRequest> = {
   },
 };
 
+function createBaseAddContactResponse(): AddContactResponse {
+  return { user: undefined };
+}
+
+export const AddContactResponse: MessageFns<AddContactResponse> = {
+  encode(message: AddContactResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.user !== undefined) {
+      UserMessage.encode(message.user, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AddContactResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAddContactResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.user = UserMessage.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AddContactResponse {
+    return { user: isSet(object.user) ? UserMessage.fromJSON(object.user) : undefined };
+  },
+
+  toJSON(message: AddContactResponse): unknown {
+    const obj: any = {};
+    if (message.user !== undefined) {
+      obj.user = UserMessage.toJSON(message.user);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AddContactResponse>, I>>(base?: I): AddContactResponse {
+    return AddContactResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AddContactResponse>, I>>(object: I): AddContactResponse {
+    const message = createBaseAddContactResponse();
+    message.user = (object.user !== undefined && object.user !== null)
+      ? UserMessage.fromPartial(object.user)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseRemoveContactRequest(): RemoveContactRequest {
   return { userId: "", contactEmail: "" };
 }
@@ -492,27 +557,27 @@ export const RemoveContactRequest: MessageFns<RemoveContactRequest> = {
   },
 };
 
-function createBaseUserResponse(): UserResponse {
+function createBaseRemoveContactResponse(): RemoveContactResponse {
   return { user: undefined };
 }
 
-export const UserResponse: MessageFns<UserResponse> = {
-  encode(message: UserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const RemoveContactResponse: MessageFns<RemoveContactResponse> = {
+  encode(message: RemoveContactResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.user !== undefined) {
-      UserMessage.encode(message.user, writer.uint32(18).fork()).join();
+      UserMessage.encode(message.user, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UserResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): RemoveContactResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUserResponse();
+    const message = createBaseRemoveContactResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 2: {
-          if (tag !== 18) {
+        case 1: {
+          if (tag !== 10) {
             break;
           }
 
@@ -528,11 +593,11 @@ export const UserResponse: MessageFns<UserResponse> = {
     return message;
   },
 
-  fromJSON(object: any): UserResponse {
+  fromJSON(object: any): RemoveContactResponse {
     return { user: isSet(object.user) ? UserMessage.fromJSON(object.user) : undefined };
   },
 
-  toJSON(message: UserResponse): unknown {
+  toJSON(message: RemoveContactResponse): unknown {
     const obj: any = {};
     if (message.user !== undefined) {
       obj.user = UserMessage.toJSON(message.user);
@@ -540,11 +605,11 @@ export const UserResponse: MessageFns<UserResponse> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<UserResponse>, I>>(base?: I): UserResponse {
-    return UserResponse.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<RemoveContactResponse>, I>>(base?: I): RemoveContactResponse {
+    return RemoveContactResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<UserResponse>, I>>(object: I): UserResponse {
-    const message = createBaseUserResponse();
+  fromPartial<I extends Exact<DeepPartial<RemoveContactResponse>, I>>(object: I): RemoveContactResponse {
+    const message = createBaseRemoveContactResponse();
     message.user = (object.user !== undefined && object.user !== null)
       ? UserMessage.fromPartial(object.user)
       : undefined;
@@ -553,7 +618,7 @@ export const UserResponse: MessageFns<UserResponse> = {
 };
 
 function createBaseUserMessage(): UserMessage {
-  return { id: "", name: "", email: "", phone: "", contacts: [], createdAt: "", updatedAt: "" };
+  return { id: "", name: "", email: "", phone: "", contacts: [], createdAt: undefined, updatedAt: undefined };
 }
 
 export const UserMessage: MessageFns<UserMessage> = {
@@ -573,11 +638,11 @@ export const UserMessage: MessageFns<UserMessage> = {
     for (const v of message.contacts) {
       ContactMessage.encode(v!, writer.uint32(42).fork()).join();
     }
-    if (message.createdAt !== "") {
-      writer.uint32(50).string(message.createdAt);
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(50).fork()).join();
     }
-    if (message.updatedAt !== "") {
-      writer.uint32(58).string(message.updatedAt);
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(58).fork()).join();
     }
     return writer;
   },
@@ -634,7 +699,7 @@ export const UserMessage: MessageFns<UserMessage> = {
             break;
           }
 
-          message.createdAt = reader.string();
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
         case 7: {
@@ -642,7 +707,7 @@ export const UserMessage: MessageFns<UserMessage> = {
             break;
           }
 
-          message.updatedAt = reader.string();
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
       }
@@ -663,8 +728,8 @@ export const UserMessage: MessageFns<UserMessage> = {
       contacts: globalThis.Array.isArray(object?.contacts)
         ? object.contacts.map((e: any) => ContactMessage.fromJSON(e))
         : [],
-      createdAt: isSet(object.createdAt) ? globalThis.String(object.createdAt) : "",
-      updatedAt: isSet(object.updatedAt) ? globalThis.String(object.updatedAt) : "",
+      createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
+      updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
     };
   },
 
@@ -685,11 +750,11 @@ export const UserMessage: MessageFns<UserMessage> = {
     if (message.contacts?.length) {
       obj.contacts = message.contacts.map((e) => ContactMessage.toJSON(e));
     }
-    if (message.createdAt !== "") {
-      obj.createdAt = message.createdAt;
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt.toISOString();
     }
-    if (message.updatedAt !== "") {
-      obj.updatedAt = message.updatedAt;
+    if (message.updatedAt !== undefined) {
+      obj.updatedAt = message.updatedAt.toISOString();
     }
     return obj;
   },
@@ -704,8 +769,8 @@ export const UserMessage: MessageFns<UserMessage> = {
     message.email = object.email ?? "";
     message.phone = object.phone ?? "";
     message.contacts = object.contacts?.map((e) => ContactMessage.fromPartial(e)) || [];
-    message.createdAt = object.createdAt ?? "";
-    message.updatedAt = object.updatedAt ?? "";
+    message.createdAt = object.createdAt ?? undefined;
+    message.updatedAt = object.updatedAt ?? undefined;
     return message;
   },
 };
@@ -844,8 +909,8 @@ export const UserServiceService = {
     responseStream: false,
     requestSerialize: (value: AddContactRequest): Buffer => Buffer.from(AddContactRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer): AddContactRequest => AddContactRequest.decode(value),
-    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
+    responseSerialize: (value: AddContactResponse): Buffer => Buffer.from(AddContactResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): AddContactResponse => AddContactResponse.decode(value),
   },
   removeContactFromUser: {
     path: "/user_service.UserService/RemoveContactFromUser",
@@ -853,16 +918,17 @@ export const UserServiceService = {
     responseStream: false,
     requestSerialize: (value: RemoveContactRequest): Buffer => Buffer.from(RemoveContactRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer): RemoveContactRequest => RemoveContactRequest.decode(value),
-    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
+    responseSerialize: (value: RemoveContactResponse): Buffer =>
+      Buffer.from(RemoveContactResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): RemoveContactResponse => RemoveContactResponse.decode(value),
   },
 } as const;
 
 export interface UserServiceServer extends UntypedServiceImplementation {
   createUser: handleUnaryCall<CreateUserRequest, CreateUserResponse>;
   getUserById: handleUnaryCall<GetUserByIdRequest, GetUserResponse>;
-  addContactToUser: handleUnaryCall<AddContactRequest, UserResponse>;
-  removeContactFromUser: handleUnaryCall<RemoveContactRequest, UserResponse>;
+  addContactToUser: handleUnaryCall<AddContactRequest, AddContactResponse>;
+  removeContactFromUser: handleUnaryCall<RemoveContactRequest, RemoveContactResponse>;
 }
 
 export interface UserServiceClient extends Client {
@@ -898,33 +964,33 @@ export interface UserServiceClient extends Client {
   ): ClientUnaryCall;
   addContactToUser(
     request: AddContactRequest,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: AddContactResponse) => void,
   ): ClientUnaryCall;
   addContactToUser(
     request: AddContactRequest,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: AddContactResponse) => void,
   ): ClientUnaryCall;
   addContactToUser(
     request: AddContactRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: AddContactResponse) => void,
   ): ClientUnaryCall;
   removeContactFromUser(
     request: RemoveContactRequest,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: RemoveContactResponse) => void,
   ): ClientUnaryCall;
   removeContactFromUser(
     request: RemoveContactRequest,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: RemoveContactResponse) => void,
   ): ClientUnaryCall;
   removeContactFromUser(
     request: RemoveContactRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: RemoveContactResponse) => void,
   ): ClientUnaryCall;
 }
 
@@ -948,6 +1014,28 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function toTimestamp(date: Date): Timestamp {
+  const seconds = Math.trunc(date.getTime() / 1_000);
+  const nanos = (date.getTime() % 1_000) * 1_000_000;
+  return { seconds, nanos };
+}
+
+function fromTimestamp(t: Timestamp): Date {
+  let millis = (t.seconds || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
+  return new globalThis.Date(millis);
+}
+
+function fromJsonTimestamp(o: any): Date {
+  if (o instanceof globalThis.Date) {
+    return o;
+  } else if (typeof o === "string") {
+    return new globalThis.Date(o);
+  } else {
+    return fromTimestamp(Timestamp.fromJSON(o));
+  }
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

@@ -1,11 +1,14 @@
 import * as grpc from '@grpc/grpc-js';
 import {
   AddContactRequest,
+  AddContactResponse,
   CreateUserRequest,
   CreateUserResponse,
   GetUserByIdRequest,
   GetUserResponse,
-  UserResponse
+  RemoveContactRequest,
+  RemoveContactResponse,
+  UserMessage
 } from '@/generated/user_service';
 import User, { IUserDocument } from '@/models/user.model';
 import logger from '@/lib/logger';
@@ -27,17 +30,20 @@ export class UserService {
         });
       }
 
-      const user = new User({
+      const user = await User.create({
         name: request.name,
         email: request.email,
         phone: request.phone
       });
 
-      const createdUser = await user.save();
+      const mappedUser = this.mapUserToResponse(user);
 
-      const response = await this.mapUserToResponse(createdUser);
+      // !
+      logger.debug(JSON.stringify(mappedUser, null, 2));
 
-      callback(null, response);
+      callback(null, {
+        user: mappedUser
+      });
     } catch (error) {
       logger.error('Error creating user:', error);
 
@@ -52,7 +58,7 @@ export class UserService {
     try {
       const request = call.request;
 
-      const user = await User.findById(request.id).populate('contacts');
+      const user = await User.findById(request.userId).populate('contacts');
 
       if (!user) {
         return callback({
@@ -61,9 +67,11 @@ export class UserService {
         });
       }
 
-      const response: CreateUserResponse = await this.mapUserToResponse(user);
+      const mappedUser = this.mapUserToResponse(user);
 
-      callback(null, response);
+      callback(null, {
+        user: mappedUser
+      });
     } catch (error) {
       logger.error('Error getting user by ID:', error);
 
@@ -74,7 +82,10 @@ export class UserService {
     }
   }
 
-  public async addContactToUser(call: grpc.ServerUnaryCall<AddContactRequest, UserResponse>, callback: grpc.sendUnaryData<UserResponse>) {
+  public async addContactToUser(
+    call: grpc.ServerUnaryCall<AddContactRequest, AddContactResponse>,
+    callback: grpc.sendUnaryData<AddContactResponse>
+  ) {
     try {
       const request = call.request;
 
@@ -114,9 +125,11 @@ export class UserService {
         });
       }
 
-      const response = await this.mapUserToResponse(updatedUser);
+      const mappedUser = this.mapUserToResponse(updatedUser);
 
-      callback(null, response);
+      callback(null, {
+        user: mappedUser
+      });
     } catch (error) {
       logger.error('Error adding contact to user:', error);
 
@@ -128,8 +141,8 @@ export class UserService {
   }
 
   public async removeContactFromUser(
-    call: grpc.ServerUnaryCall<AddContactRequest, UserResponse>,
-    callback: grpc.sendUnaryData<UserResponse>
+    call: grpc.ServerUnaryCall<RemoveContactRequest, RemoveContactResponse>,
+    callback: grpc.sendUnaryData<RemoveContactResponse>
   ) {
     try {
       const request = call.request;
@@ -163,9 +176,11 @@ export class UserService {
         });
       }
 
-      const response = await this.mapUserToResponse(updatedUser);
+      const mappedUser = this.mapUserToResponse(updatedUser);
 
-      callback(null, response);
+      callback(null, {
+        user: mappedUser
+      });
     } catch (error) {
       logger.error('Error removing contact from user:', error);
 
@@ -176,17 +191,20 @@ export class UserService {
     }
   }
 
-  private async mapUserToResponse(user: IUserDocument): Promise<UserResponse> {
+  private mapUserToResponse(user: IUserDocument): UserMessage {
     return {
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        contacts: user.contacts,
-        createdAt: user.createdAt.toString(),
-        updatedAt: user.updatedAt.toString()
-      }
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      contacts: user.contacts.map((contact) => ({
+        id: contact.id,
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone
+      })),
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
     };
   }
 }
