@@ -17,6 +17,7 @@
     "@types/node": "^24.1.0",
     "grpc-tools": "^1.13.0",
     "nodemon": "^3.1.10",
+    "prisma": "^6.13.0",
     "ts-node": "^10.9.2",
     "ts-proto": "^2.7.5",
     "tsconfig-paths": "^4.2.0",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
     "@grpc/proto-loader": "^0.8.0",
+    "@prisma/client": "^6.13.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
