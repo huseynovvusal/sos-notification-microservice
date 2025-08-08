@@ -1,14 +1,19 @@
-FROM node:alpine
+FROM node:18 AS builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y protobuf-compiler
+
 COPY package*.json ./
-COPY tsconfig.json ./
+RUN npm install
 
-RUN npm install && npm install -g nodemon
+RUN npm run generate-proto
 
+FROM node:18-slim
+
+WORKDIR /app
+
+COPY --from=builder /app .
 COPY . .
 
-EXPOSE 3001
-
-CMD [ "npm", "run", "dev" ]
+CMD ["npm", "run", "dev"]
