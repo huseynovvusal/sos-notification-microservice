@@ -38,9 +38,6 @@ export class UserService {
 
       const mappedUser = this.mapUserToResponse(user);
 
-      // !
-      logger.debug(JSON.stringify(mappedUser, null, 2));
-
       callback(null, {
         user: mappedUser
       });
