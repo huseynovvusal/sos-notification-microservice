@@ -4,8 +4,8 @@ import * as grpc from '@grpc/grpc-js';
 import { config } from '@/config';
 import { connectDatabase } from '@/db/connection';
 import logger from '@/lib/logger';
-import { UserServiceService } from './generated/user_service';
-import { userServiceImplementation } from './grpc/user-service-impl';
+import { UserServiceService } from '@/generated/proto/user_service';
+import { userServiceImplementation } from '@/grpc/user-service-impl';
 
 const grpcServer = new grpc.Server();
 

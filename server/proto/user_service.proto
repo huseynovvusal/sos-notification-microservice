@@ -55,9 +55,6 @@ message UserMessage {
     string name = 2;
     string email = 3;
     string phone = 4;
-    repeated ContactMessage contacts = 5;
-    google.protobuf.Timestamp createdAt = 6;
-    google.protobuf.Timestamp updatedAt = 7;
 }
 
 message ContactMessage {

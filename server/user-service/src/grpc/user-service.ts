@@ -9,19 +9,22 @@ import {
   RemoveContactRequest,
   RemoveContactResponse,
   UserMessage
-} from '@/generated/user_service';
-import User, { IUserDocument } from '@/models/user.model';
+} from '@/generated/proto/user_service';
 import logger from '@/lib/logger';
+import { User } from '@/generated/prisma';
+import { userRepository, UserRepository } from '@/repositories/user.repository';
 
 export class UserService {
+  constructor(private readonly userRepository: UserRepository) {}
+
   public async createUser(
     call: grpc.ServerUnaryCall<CreateUserRequest, CreateUserResponse>,
     callback: grpc.sendUnaryData<CreateUserResponse>
   ) {
     try {
-      const request = call.request;
+      const { email, name, phone } = call.request;
 
-      const existingUser = await User.findOne({ $or: [{ email: request.email }, { phone: request.phone }] });
+      const existingUser = await this.userRepository.userExistsWithEmailOrPassword(email, phone);
 
       if (existingUser) {
         return callback({
@@ -30,10 +33,10 @@ export class UserService {
         });
       }
 
-      const user = await User.create({
-        name: request.name,
-        email: request.email,
-        phone: request.phone
+      const user = await this.userRepository.createUser({
+        name,
+        email,
+        phone
       });
 
       const mappedUser = this.mapUserToResponse(user);
@@ -55,7 +58,7 @@ export class UserService {
     try {
       const request = call.request;
 
-      const user = await User.findById(request.userId).populate('contacts');
+      const user = await this.userRepository.getUserById(request.userId);
 
       if (!user) {
         return callback({
@@ -84,18 +87,18 @@ export class UserService {
     callback: grpc.sendUnaryData<AddContactResponse>
   ) {
     try {
-      const request = call.request;
+      const { userId, contactEmail } = call.request;
 
-      if (!request.contactEmail) {
+      if (!contactEmail) {
         return callback({
           code: grpc.status.INVALID_ARGUMENT,
           message: 'Contact email is required'
         });
       }
 
-      logger.info(`Adding contact with email ${request.contactEmail} to user with ID ${request.userId}`);
+      logger.info(`Adding contact with email ${contactEmail} to user with ID ${userId}`);
 
-      const contact = await User.findOne({ email: request.contactEmail });
+      const contact = await this.userRepository.getUserByEmail(contactEmail);
 
       if (!contact) {
         return callback({
@@ -104,16 +107,16 @@ export class UserService {
         });
       }
 
-      if (contact.id === request.userId) {
+      if (contact.id === userId) {
         return callback({
           code: grpc.status.INVALID_ARGUMENT,
           message: 'Cannot add yourself as a contact'
         });
       }
 
-      const updatedUser = await User.findByIdAndUpdate(request.userId, { $addToSet: { contacts: contact.id } }, { new: true }).populate(
-        'contacts'
-      );
+      const updatedUser = await this.userRepository.addTrustedContactToUserById(userId, contact.id);
+
+      logger.debug(`Updated user with new contact:\n${JSON.stringify(updatedUser, null, 2)}`);
 
       if (!updatedUser) {
         return callback({
@@ -153,7 +156,7 @@ export class UserService {
 
       logger.info(`Removing contact with email ${request.contactEmail} from user with ID ${request.userId}`);
 
-      const contact = await User.findOne({ email: request.contactEmail });
+      const contact = await this.userRepository.getUserByEmail(request.contactEmail);
 
       if (!contact) {
         return callback({
@@ -162,9 +165,7 @@ export class UserService {
         });
       }
 
-      const updatedUser = await User.findByIdAndUpdate(request.userId, { $pull: { contacts: contact.id } }, { new: true }).populate(
-        'contacts'
-      );
+      const updatedUser = await this.userRepository.removeTrustedContactFromUserById(request.userId, contact.id);
 
       if (!updatedUser) {
         return callback({
@@ -188,22 +189,14 @@ export class UserService {
     }
   }
 
-  private mapUserToResponse(user: IUserDocument): UserMessage {
+  private mapUserToResponse(user: User): UserMessage {
     return {
       id: user.id,
       name: user.name,
       email: user.email,
-      phone: user.phone,
-      contacts: user.contacts.map((contact) => ({
-        id: contact.id,
-        name: contact.name,
-        email: contact.email,
-        phone: contact.phone
-      })),
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
+      phone: user.phone
     };
   }
 }
 
-export const userService = new UserService();
+export const userService = new UserService(userRepository);

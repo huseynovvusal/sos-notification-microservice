@@ -18,7 +18,6 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
-import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "user_service";
 
@@ -63,9 +62,6 @@ export interface UserMessage {
   name: string;
   email: string;
   phone: string;
-  contacts: ContactMessage[];
-  createdAt: Date | undefined;
-  updatedAt: Date | undefined;
 }
 
 export interface ContactMessage {
@@ -618,7 +614,7 @@ export const RemoveContactResponse: MessageFns<RemoveContactResponse> = {
 };
 
 function createBaseUserMessage(): UserMessage {
-  return { id: "", name: "", email: "", phone: "", contacts: [], createdAt: undefined, updatedAt: undefined };
+  return { id: "", name: "", email: "", phone: "" };
 }
 
 export const UserMessage: MessageFns<UserMessage> = {
@@ -634,15 +630,6 @@ export const UserMessage: MessageFns<UserMessage> = {
     }
     if (message.phone !== "") {
       writer.uint32(34).string(message.phone);
-    }
-    for (const v of message.contacts) {
-      ContactMessage.encode(v!, writer.uint32(42).fork()).join();
-    }
-    if (message.createdAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(50).fork()).join();
-    }
-    if (message.updatedAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(58).fork()).join();
     }
     return writer;
   },
@@ -686,30 +673,6 @@ export const UserMessage: MessageFns<UserMessage> = {
           message.phone = reader.string();
           continue;
         }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
-
-          message.contacts.push(ContactMessage.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
-
-          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
-
-          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
-          continue;
-        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -725,11 +688,6 @@ export const UserMessage: MessageFns<UserMessage> = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       phone: isSet(object.phone) ? globalThis.String(object.phone) : "",
-      contacts: globalThis.Array.isArray(object?.contacts)
-        ? object.contacts.map((e: any) => ContactMessage.fromJSON(e))
-        : [],
-      createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
-      updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
     };
   },
 
@@ -747,15 +705,6 @@ export const UserMessage: MessageFns<UserMessage> = {
     if (message.phone !== "") {
       obj.phone = message.phone;
     }
-    if (message.contacts?.length) {
-      obj.contacts = message.contacts.map((e) => ContactMessage.toJSON(e));
-    }
-    if (message.createdAt !== undefined) {
-      obj.createdAt = message.createdAt.toISOString();
-    }
-    if (message.updatedAt !== undefined) {
-      obj.updatedAt = message.updatedAt.toISOString();
-    }
     return obj;
   },
 
@@ -768,9 +717,6 @@ export const UserMessage: MessageFns<UserMessage> = {
     message.name = object.name ?? "";
     message.email = object.email ?? "";
     message.phone = object.phone ?? "";
-    message.contacts = object.contacts?.map((e) => ContactMessage.fromPartial(e)) || [];
-    message.createdAt = object.createdAt ?? undefined;
-    message.updatedAt = object.updatedAt ?? undefined;
     return message;
   },
 };
@@ -1014,28 +960,6 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
-function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000);
-  const nanos = (date.getTime() % 1_000) * 1_000_000;
-  return { seconds, nanos };
-}
-
-function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
-  millis += (t.nanos || 0) / 1_000_000;
-  return new globalThis.Date(millis);
-}
-
-function fromJsonTimestamp(o: any): Date {
-  if (o instanceof globalThis.Date) {
-    return o;
-  } else if (typeof o === "string") {
-    return new globalThis.Date(o);
-  } else {
-    return fromTimestamp(Timestamp.fromJSON(o));
-  }
-}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

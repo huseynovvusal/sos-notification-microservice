@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src --exec ts-node -r tsconfig-paths/register src/server.ts | pino-pretty -c",
-    "generate-proto": "npx protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true,outputServices=grpc-js,env=node -I=../proto ../proto/user_service.proto"
+    "generate-proto": "npx protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/generated/proto --ts_proto_opt=esModuleInterop=true,outputServices=grpc-js,env=node -I=../proto ../proto/user_service.proto"
   },
   "keywords": [],
   "author": "",

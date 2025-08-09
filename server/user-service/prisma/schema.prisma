@@ -27,9 +27,9 @@ model User {
 
 model TrustedContact {
   id        String   @id @default(cuid())
-  user      User     @relation("UserTrustedContacts", fields: [userId], references: [id])
+  user      User     @relation("UserTrustedContacts", fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  contact   User     @relation("UserTrustedBy", fields: [contactId], references: [id])
+  contact   User     @relation("UserTrustedBy", fields: [contactId], references: [id], onDelete: Cascade)
   contactId String
   createdAt DateTime @default(now())
 
