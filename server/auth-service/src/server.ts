@@ -2,15 +2,15 @@ import * as grpc from '@grpc/grpc-js';
 import mongoose from 'mongoose';
 
 import logger from '@/lib/logger';
-import { connectDatabase } from './db/connection';
-import { config } from './config';
-import { AuthServiceService } from './generated/auth_service';
-import { authServiceImplementation } from './grpc/auth-service-impl';
+import { connectDatabase } from '@/db/connection';
+import { config } from '@/config';
+import { authServiceGrpc } from '@sos-notification-microservice/shared';
+import { authServiceImplementation } from '@/grpc/auth-service-impl';
 
 const grpcServer = new grpc.Server();
 
 function setupGrpcServer(): grpc.Server {
-  grpcServer.addService(AuthServiceService, authServiceImplementation);
+  grpcServer.addService(authServiceGrpc.AuthServiceService, authServiceImplementation);
 
   const grpcHost = config.GRPC_HOST;
   const grpcPort = config.GRPC_PORT;

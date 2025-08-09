@@ -1,18 +1,20 @@
 import { config } from '@/config';
-import { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '@/generated/auth_service';
 import Auth from '@/models/auth.model';
 import * as grpc from '@grpc/grpc-js';
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { userServiceClient } from './user-service-client';
-import { CreateUserResponse } from '@/generated/user_service';
+import { authServiceGrpc, userServiceGrpc } from '@sos-notification-microservice/shared';
 import logger from '@/lib/logger';
 
 export class AuthService {
-  public async register(call: grpc.ServerUnaryCall<RegisterRequest, RegisterResponse>, callback: grpc.sendUnaryData<RegisterResponse>) {
+  public async register(
+    call: grpc.ServerUnaryCall<authServiceGrpc.RegisterRequest, authServiceGrpc.RegisterResponse>,
+    callback: grpc.sendUnaryData<authServiceGrpc.RegisterResponse>
+  ) {
     const { name, phone, email, password } = call.request;
 
-    let createUserResponse: CreateUserResponse = await new Promise((resolve, reject) => {
+    let createUserResponse: userServiceGrpc.CreateUserResponse = await new Promise((resolve, reject) => {
       userServiceClient.createUser({ name, phone, email }, (err, response) => {
         if (err) {
           logger.error('Error creating user:', err);
@@ -42,7 +44,10 @@ export class AuthService {
     callback(null, { accessToken: accessToken });
   }
 
-  public async login(call: grpc.ServerUnaryCall<LoginRequest, LoginResponse>, callback: grpc.sendUnaryData<LoginResponse>) {
+  public async login(
+    call: grpc.ServerUnaryCall<authServiceGrpc.LoginRequest, authServiceGrpc.LoginResponse>,
+    callback: grpc.sendUnaryData<authServiceGrpc.LoginResponse>
+  ) {
     const { email, password } = call.request;
 
     const user = await Auth.findOne({ where: { email } });
