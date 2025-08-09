@@ -1,0 +1,35 @@
+{
+  "name": "@sos-notification-microservice/shared",
+  "version": "1.0.0",
+  "description": "Shared library for SOS Notification Microservice",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run generate-proto && npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build:types": "tsc --project tsconfig.types.json",
+    "generate-proto": "npx protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/proto --ts_proto_opt=esModuleInterop=true,outputServices=grpc-js,env=node -I=./proto ./proto/*.proto"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "ts-proto": "^2.7.6",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.13.4"
+  }
+}
