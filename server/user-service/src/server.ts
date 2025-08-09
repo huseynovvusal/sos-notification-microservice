@@ -4,13 +4,13 @@ import * as grpc from '@grpc/grpc-js';
 import { config } from '@/config';
 import { connectDatabase } from '@/db/connection';
 import logger from '@/lib/logger';
-import { UserServiceService } from '@/generated/proto/user_service';
+import { userServiceGrpc } from '@sos-notification-microservice/shared';
 import { userServiceImplementation } from '@/grpc/user-service-impl';
 
 const grpcServer = new grpc.Server();
 
 function setupGrpcServer(): grpc.Server {
-  grpcServer.addService(UserServiceService, userServiceImplementation);
+  grpcServer.addService(userServiceGrpc.UserServiceService, userServiceImplementation);
 
   const grpcHost = config.GRPC_HOST;
   const grpcPort = config.GRPC_PORT;

@@ -1,15 +1,5 @@
 import * as grpc from '@grpc/grpc-js';
-import {
-  AddContactRequest,
-  AddContactResponse,
-  CreateUserRequest,
-  CreateUserResponse,
-  GetUserByIdRequest,
-  GetUserResponse,
-  RemoveContactRequest,
-  RemoveContactResponse,
-  UserMessage
-} from '@/generated/proto/user_service';
+import { userServiceGrpc } from '@sos-notification-microservice/shared';
 import logger from '@/lib/logger';
 import { User } from '@/generated/prisma';
 import { userRepository, UserRepository } from '@/repositories/user.repository';
@@ -18,8 +8,8 @@ export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
   public async createUser(
-    call: grpc.ServerUnaryCall<CreateUserRequest, CreateUserResponse>,
-    callback: grpc.sendUnaryData<CreateUserResponse>
+    call: grpc.ServerUnaryCall<userServiceGrpc.CreateUserRequest, userServiceGrpc.CreateUserResponse>,
+    callback: grpc.sendUnaryData<userServiceGrpc.CreateUserResponse>
   ) {
     try {
       const { email, name, phone } = call.request;
@@ -54,7 +44,10 @@ export class UserService {
     }
   }
 
-  public async getUserById(call: grpc.ServerUnaryCall<GetUserByIdRequest, GetUserResponse>, callback: grpc.sendUnaryData<GetUserResponse>) {
+  public async getUserById(
+    call: grpc.ServerUnaryCall<userServiceGrpc.GetUserByIdRequest, userServiceGrpc.GetUserResponse>,
+    callback: grpc.sendUnaryData<userServiceGrpc.GetUserResponse>
+  ) {
     try {
       const request = call.request;
 
@@ -83,8 +76,8 @@ export class UserService {
   }
 
   public async addContactToUser(
-    call: grpc.ServerUnaryCall<AddContactRequest, AddContactResponse>,
-    callback: grpc.sendUnaryData<AddContactResponse>
+    call: grpc.ServerUnaryCall<userServiceGrpc.AddContactRequest, userServiceGrpc.AddContactResponse>,
+    callback: grpc.sendUnaryData<userServiceGrpc.AddContactResponse>
   ) {
     try {
       const { userId, contactEmail } = call.request;
@@ -141,8 +134,8 @@ export class UserService {
   }
 
   public async removeContactFromUser(
-    call: grpc.ServerUnaryCall<RemoveContactRequest, RemoveContactResponse>,
-    callback: grpc.sendUnaryData<RemoveContactResponse>
+    call: grpc.ServerUnaryCall<userServiceGrpc.RemoveContactRequest, userServiceGrpc.RemoveContactResponse>,
+    callback: grpc.sendUnaryData<userServiceGrpc.RemoveContactResponse>
   ) {
     try {
       const request = call.request;
@@ -189,7 +182,7 @@ export class UserService {
     }
   }
 
-  private mapUserToResponse(user: User): UserMessage {
+  private mapUserToResponse(user: User) {
     return {
       id: user.id,
       name: user.name,
