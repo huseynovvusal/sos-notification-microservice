@@ -32,6 +32,8 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.6.3",
     "@grpc/grpc-js": "^1.13.4",
-    "@grpc/proto-loader": "^0.8.0"
+    "@grpc/proto-loader": "^0.8.0",
+    "morgan": "^1.10.1",
+    "winston": "^3.17.0"
   }
 }

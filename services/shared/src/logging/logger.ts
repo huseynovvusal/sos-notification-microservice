@@ -1,0 +1,34 @@
+import winston, { Logger } from "winston"
+
+function createLogger(level: string, name: string): Logger {
+  const logger = winston.createLogger({
+    level: level,
+    defaultMeta: {
+      service: name,
+    },
+    transports: [
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.colorize(),
+          winston.format.timestamp(),
+          winston.format.printf(({ timestamp, level, message }) => {
+            return `${timestamp} [${level}]: ${message}`
+          })
+        ),
+      }),
+      new winston.transports.File({
+        format: winston.format.combine(winston.format.json(), winston.format.timestamp()),
+        filename: "combined.log",
+      }),
+      new winston.transports.File({
+        format: winston.format.combine(winston.format.json(), winston.format.timestamp()),
+        filename: "error.log",
+        level: "error",
+      }),
+    ],
+  })
+
+  return logger
+}
+
+export { createLogger }
