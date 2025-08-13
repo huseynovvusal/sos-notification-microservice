@@ -12,7 +12,7 @@ services:
     volumes:
       - ./volumes/postgres:/var/lib/postgresql/data
     networks:
-      - backend_network
+      - backend-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -29,7 +29,7 @@ services:
     volumes:
       - ./volumes/pgadmin:/var/lib/pgadmin
     networks:
-      - backend_network
+      - backend-network
 
   mongo:
     image: mongo:latest
@@ -39,7 +39,7 @@ services:
     volumes:
       - ./volumes/mongo:/data/db
     networks:
-      - backend_network
+      - backend-network
 
   redis:
     image: redis:latest
@@ -47,7 +47,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - backend_network
+      - backend-network
 
   rabbitmq:
     image: rabbitmq:management
@@ -56,7 +56,37 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      - backend_network
+      - backend-network
+
+  elasticsearch:
+    image: elasticsearch:9.1.2
+    container_name: elasticsearch_container
+    environment:
+      - xpack.security.enabled=true
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=changeme
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ./volumes/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - elastic-network
+
+  kibana:
+    image: kibana:9.1.2
+    container_name: kibana_container
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - ./elk-stack/kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic-network
 
   # user-service:
   #   build:
@@ -107,11 +137,12 @@ services:
 
 volumes:
   mongo_data:
-    driver: local
   postgres_data:
-    driver: local
   pgadmin_data:
-    driver: local
+  elasticsearch_data:
+
 networks:
-  backend_network:
+  backend-network:
+    driver: bridge
+  elastic-network:
     driver: bridge
