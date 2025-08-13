@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  elasticsearch:
+    image: elasticsearch:9.1.2
+    container_name: elasticsearch_container
+    environment:
+      - xpack.security.enabled=true
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=changeme
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ./volumes/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - elk-network
+
+  logstash:
+    image: logstash:9.1.2
+    container_name: logstash_container
+    ports:
+      - "5000:5000/tcp"
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-network
+
+  kibana:
+    image: kibana:9.1.2
+    container_name: kibana_container
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - ./elk-stack/kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-network
+
+volumes:
+  elasticsearch_data:
+
+networks:
+  elk-network:
+    driver: bridge
