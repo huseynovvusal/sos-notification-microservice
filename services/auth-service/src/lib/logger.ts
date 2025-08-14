@@ -1,4 +1,4 @@
-import path from 'path';
+/* import path from 'path';
 import winston from 'winston';
 
 const { combine, timestamp, printf, colorize } = winston.format;
@@ -21,5 +21,19 @@ const logger = winston.createLogger({
     })
   ]
 });
+
+export default logger;
+ */
+
+import { logging } from '@sos-notification-microservice/shared';
+
+const logger = logging.createLogger(
+  {
+    host: 'localhost',
+    port: 5000
+  },
+  'info',
+  'user-service'
+);
 
 export default logger;

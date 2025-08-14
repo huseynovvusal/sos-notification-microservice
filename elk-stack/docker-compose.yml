@@ -21,7 +21,8 @@ services:
     image: logstash:9.1.2
     container_name: logstash_container
     ports:
-      - "5000:5000/tcp"
+      - "5000:5000"
+      - "5001:5001"
     volumes:
       - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
@@ -39,7 +40,6 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     volumes:
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml
-
     depends_on:
       - elasticsearch
     networks:
