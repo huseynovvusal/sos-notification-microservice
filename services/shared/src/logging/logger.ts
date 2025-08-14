@@ -1,6 +1,19 @@
 import winston, { Logger } from "winston"
+import { createLogstashTransport } from "./logstash-transport"
 
-function createLogger(level: string, name: string): Logger {
+function createLogger(
+  logstashTransportConfig: {
+    host: string
+    port: number
+  },
+  level: string,
+  name: string
+): Logger {
+  const logstashTransport = createLogstashTransport(
+    logstashTransportConfig.host,
+    logstashTransportConfig.port
+  )
+
   const logger = winston.createLogger({
     level: level,
     defaultMeta: {
@@ -16,7 +29,7 @@ function createLogger(level: string, name: string): Logger {
           })
         ),
       }),
-      new winston.transports.File({
+      /*new winston.transports.File({
         format: winston.format.combine(winston.format.json(), winston.format.timestamp()),
         filename: "combined.log",
       }),
@@ -24,7 +37,8 @@ function createLogger(level: string, name: string): Logger {
         format: winston.format.combine(winston.format.json(), winston.format.timestamp()),
         filename: "error.log",
         level: "error",
-      }),
+      }), */
+      logstashTransport,
     ],
   })
 

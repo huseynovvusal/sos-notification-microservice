@@ -9,3 +9,6 @@ export * as google from "./proto/google/protobuf/timestamp"
 
 // Helper exports
 export * as helpers from "./helpers"
+
+// Logger exports
+export * as logging from "./logging"
