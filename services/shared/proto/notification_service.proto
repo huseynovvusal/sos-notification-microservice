@@ -3,7 +3,8 @@ syntax = "proto3";
 package notification_service;
 
 service NotificationService {
-    rcp StreamLocation(stream LocationStreamRequest) 
+    rpc StreamLocation(stream LocationStreamRequest)  returns (stream LocationStreamResponse);
+    
 }
 
 message LocationStreamRequest {

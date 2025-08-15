@@ -3,10 +3,15 @@ import mongoose from 'mongoose';
 
 import logger from '@/lib/logger';
 import { config } from '@/config';
+import { Channel, ChannelModel } from 'amqplib';
+import { connectToRabbitMQ } from './queues/connection';
 
 const grpcServer = new grpc.Server();
 
-function setupGrpcServer(): grpc.Server {
+let rabbitMQConnection: ChannelModel;
+let rabbitMQChannel: Channel;
+
+function setupGrpcServer(): void {
   const grpcHost = config.GRPC_HOST;
   const grpcPort = config.GRPC_PORT;
 
@@ -20,11 +25,17 @@ function setupGrpcServer(): grpc.Server {
 
     logger.info(`gRPC server is running on ${grpcAddress}`);
   });
+}
 
-  return grpcServer;
+async function setupRabbitMQ(): Promise<void> {
+  const { channel, connection } = await connectToRabbitMQ();
+
+  rabbitMQConnection = connection;
+  rabbitMQChannel = channel;
 }
 
 async function initialize() {
+  await setupRabbitMQ();
   setupGrpcServer();
 }
 
@@ -37,6 +48,9 @@ async function shutdown() {
   await mongoose.connection.close();
 
   grpcServer?.forceShutdown();
+
+  await rabbitMQChannel?.close();
+  await rabbitMQConnection?.close();
 
   logger.info('Notification service has been shut down gracefully.');
 

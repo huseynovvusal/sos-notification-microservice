@@ -15,6 +15,8 @@ export class Config {
   public GRPC_PORT: number | undefined;
   public USER_SERVICE_GRPC_ADDRESS: string | undefined;
 
+  public RABBITMQ_URL: string | undefined;
+
   constructor() {
     this.NODE_ENV = process.env.NODE_ENV;
     this.PORT = Number(process.env.PORT);
@@ -24,6 +26,8 @@ export class Config {
     this.GRPC_HOST = process.env.GRPC_HOST;
     this.GRPC_PORT = Number(process.env.GRPC_PORT);
     this.USER_SERVICE_GRPC_ADDRESS = process.env.USER_SERVICE_GRPC_ADDRESS;
+
+    this.RABBITMQ_URL = process.env.RABBITMQ_URL;
   }
 }
 
