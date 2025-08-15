@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package notification_service;
+
+service NotificationService {
+    rcp StreamLocation(stream LocationStreamRequest) 
+}
+
+message LocationStreamRequest {
+  string user_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  int64 timestamp = 4;
+}
+
+message LocationStreamResponse {
+  bool success = 1;
+}
+
