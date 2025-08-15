@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import logger from '@/lib/logger';
 import { config } from '@/config';
 import { Channel, ChannelModel } from 'amqplib';
-import { connectToRabbitMQ } from './queues/connection';
+import { connectToRabbitMQ } from './messaging/connection';
 
 const grpcServer = new grpc.Server();
 
