@@ -33,7 +33,7 @@ const logger = logging.createLogger(
     port: 5000
   },
   'info',
-  'auth-service'
+  'notification-service'
 );
 
 export default logger;
