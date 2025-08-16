@@ -6,6 +6,8 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { userServiceClient } from './user-service-client';
 import { authServiceGrpc, userServiceGrpc } from '@sos-notification-microservice/shared';
 import logger from '@/lib/logger';
+import { produceAuthEmailMessage } from '@/messaging/email.producer';
+import { rabbitMQChannel } from '@/messaging/connection';
 
 export class AuthService {
   public async register(
@@ -24,6 +26,11 @@ export class AuthService {
             details: err.message
           });
         }
+
+        produceAuthEmailMessage(rabbitMQChannel, {
+          receiverEmail: email,
+          receiverName: name
+        });
 
         resolve(response);
       });

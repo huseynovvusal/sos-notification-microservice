@@ -10,16 +10,11 @@ async function consumeAuthEmailMessages(channel: Channel) {
     const routingKey = messaging.EmailRoutingKeys.AUTH_EMAIL;
     const queueName = messaging.EmailQueues.AUTH_EMAIL_QUEUE;
 
-    await channel.assertExchange(exchangeName, 'direct');
+    channel.assertExchange(exchangeName, 'direct', { durable: true });
+    channel.assertQueue(queueName, { durable: true, autoDelete: false });
+    channel.bindQueue(queueName, exchangeName, routingKey);
 
-    const { queue } = await channel.assertQueue(queueName, {
-      durable: true,
-      autoDelete: false
-    });
-
-    await channel.bindQueue(queueName, exchangeName, routingKey);
-
-    channel.consume(queue, async (message: ConsumeMessage | null) => {
+    channel.consume(queueName, async (message: ConsumeMessage | null) => {
       if (!message || !message.content) {
         logger.warn('Received an empty message or message without content');
         return;

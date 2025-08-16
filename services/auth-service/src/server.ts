@@ -6,7 +6,7 @@ import { connectDatabase } from '@/db/connection';
 import { config } from '@/config';
 import { authServiceGrpc } from '@sos-notification-microservice/shared';
 import { authServiceImplementation } from '@/grpc/auth-service-impl';
-import { connectRabbitMQ } from './messaging/connection';
+import { connectRabbitMQ, rabbitMQChannel, rabbitMQConnection } from './messaging/connection';
 
 const grpcServer = new grpc.Server();
 
@@ -49,6 +49,9 @@ async function shutdown() {
   logger.info('Shutting down auth service...');
 
   await mongoose.connection.close();
+
+  await rabbitMQChannel?.close();
+  await rabbitMQConnection?.close();
 
   grpcServer?.forceShutdown();
 
