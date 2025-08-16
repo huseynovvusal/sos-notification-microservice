@@ -15,3 +15,6 @@ export * as logging from './logging';
 
 // Messaging exports
 export * as messaging from './messaging';
+
+// Types exports
+export type * from './types';

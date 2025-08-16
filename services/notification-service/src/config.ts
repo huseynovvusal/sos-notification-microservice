@@ -17,6 +17,11 @@ export class Config {
 
   public RABBITMQ_URL: string | undefined;
 
+  public EMAIL_SERVICE_HOST: string | undefined;
+  public EMAIL_SERVICE_PORT: number | undefined;
+  public EMAIL_SERVICE_USER: string | undefined;
+  public EMAIL_SERVICE_PASSWORD: string | undefined;
+
   constructor() {
     this.NODE_ENV = process.env.NODE_ENV;
     this.PORT = Number(process.env.PORT);
@@ -28,6 +33,11 @@ export class Config {
     this.USER_SERVICE_GRPC_ADDRESS = process.env.USER_SERVICE_GRPC_ADDRESS;
 
     this.RABBITMQ_URL = process.env.RABBITMQ_URL;
+
+    this.EMAIL_SERVICE_HOST = process.env.EMAIL_SERVICE_HOST;
+    this.EMAIL_SERVICE_PORT = Number(process.env.EMAIL_SERVICE_PORT);
+    this.EMAIL_SERVICE_USER = process.env.EMAIL_SERVICE_USER;
+    this.EMAIL_SERVICE_PASSWORD = process.env.EMAIL_SERVICE_PASSWORD;
   }
 }
 

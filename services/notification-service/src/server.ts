@@ -5,6 +5,7 @@ import logger from '@/lib/logger';
 import { config } from '@/config';
 import { Channel, ChannelModel } from 'amqplib';
 import { connectToRabbitMQ } from './messaging/connection';
+import { consumeAuthEmailMessages } from './messaging/email.consumer';
 
 const grpcServer = new grpc.Server();
 
@@ -36,6 +37,8 @@ async function setupRabbitMQ(): Promise<void> {
 
 async function initialize() {
   await setupRabbitMQ();
+  consumeAuthEmailMessages(rabbitMQChannel);
+
   setupGrpcServer();
 }
 
