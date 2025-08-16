@@ -22,6 +22,8 @@ export class Config {
 
   public USER_SERVICE_URL: string | undefined;
 
+  public RABBITMQ_URL: string | undefined;
+
   constructor() {
     this.NODE_ENV = process.env.NODE_ENV;
     this.PORT = Number(process.env.PORT);
@@ -38,6 +40,8 @@ export class Config {
     this.MONGO_URI = process.env.MONGO_URI;
 
     this.USER_SERVICE_URL = process.env.USER_SERVICE_URL;
+
+    this.RABBITMQ_URL = process.env.RABBITMQ_URL;
   }
 }
 

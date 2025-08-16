@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
     "@types/express": "^5.0.3",
     "@types/google-protobuf": "^3.15.12",
     "@types/jsonwebtoken": "^9.0.10",
@@ -25,6 +26,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
     "@grpc/proto-loader": "^0.8.0",
+    "amqplib": "^0.10.8",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.1",

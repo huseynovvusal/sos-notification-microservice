@@ -6,6 +6,7 @@ import { connectDatabase } from '@/db/connection';
 import { config } from '@/config';
 import { authServiceGrpc } from '@sos-notification-microservice/shared';
 import { authServiceImplementation } from '@/grpc/auth-service-impl';
+import { connectRabbitMQ } from './messaging/connection';
 
 const grpcServer = new grpc.Server();
 
@@ -34,6 +35,8 @@ function setupGrpcServer(): grpc.Server {
 }
 
 async function initialize() {
+  await connectRabbitMQ();
+
   await connectDatabase(config.MONGO_URI!);
 
   setupGrpcServer();
