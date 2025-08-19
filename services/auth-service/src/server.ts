@@ -50,10 +50,10 @@ async function shutdown() {
 
   await mongoose.connection.close();
 
+  grpcServer?.forceShutdown();
+
   await rabbitMQChannel?.close();
   await rabbitMQConnection?.close();
-
-  grpcServer?.forceShutdown();
 
   logger.info('Auth service has been shut down gracefully.');
 
@@ -65,9 +65,7 @@ process.on('SIGTERM', shutdown);
 
 process.on('uncaughtException', (error) => {
   logger.error('Uncaught Exception:', error);
-  shutdown();
 });
 process.on('unhandledRejection', (reason) => {
   logger.error('Unhandled Rejection:', reason);
-  shutdown();
 });
