@@ -48,12 +48,31 @@ initialize();
 async function shutdown() {
   logger.info('Shutting down auth service...');
 
-  await mongoose.connection.close();
+  await mongoose.disconnect();
 
-  grpcServer?.forceShutdown();
+  await new Promise<void>((resolve) => {
+    grpcServer.tryShutdown(() => {
+      logger.info('gRPC server shut down gracefully');
+      resolve();
+    });
+  });
 
-  await rabbitMQChannel?.close();
-  await rabbitMQConnection?.close();
+  if (rabbitMQChannel) {
+    try {
+      await rabbitMQChannel.close();
+      logger.info('RabbitMQ channel closed successfully.');
+    } catch (error) {
+      logger.error(`Error closing RabbitMQ channel: ${error}`);
+    }
+  }
+  if (rabbitMQConnection) {
+    try {
+      await rabbitMQConnection.close();
+      logger.info('RabbitMQ connection closed successfully.');
+    } catch (error) {
+      logger.error(`Error closing RabbitMQ connection: ${error}`);
+    }
+  }
 
   logger.info('Auth service has been shut down gracefully.');
 
@@ -62,10 +81,3 @@ async function shutdown() {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
-
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:', error);
-});
-process.on('unhandledRejection', (reason) => {
-  logger.error('Unhandled Rejection:', reason);
-});

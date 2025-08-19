@@ -47,7 +47,12 @@ async function shutdown() {
 
   await mongoose.connection.close();
 
-  grpcServer.forceShutdown();
+  await new Promise<void>((resolve) => {
+    grpcServer.tryShutdown(() => {
+      logger.info('gRPC server shut down gracefully');
+      resolve();
+    });
+  });
 
   logger.info('User service has been shut down gracefully.');
 
