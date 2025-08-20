@@ -75,6 +75,41 @@ export class UserService {
     }
   }
 
+  public async getUserContacts(
+    call: grpc.ServerUnaryCall<userServiceGrpc.GetUserContactsRequest, userServiceGrpc.GetUserContactsResponse>,
+    callback: grpc.sendUnaryData<userServiceGrpc.GetUserContactsResponse>
+  ) {
+    try {
+      const { userId } = call.request;
+      const contacts = await this.userRepository.getUserContacts(userId);
+
+      if (!contacts) {
+        return callback({
+          code: grpc.status.NOT_FOUND,
+          message: 'No contacts found for the user'
+        });
+      }
+
+      const mappedContacts = contacts.map((contact) => ({
+        id: contact.contact.id,
+        name: contact.contact.name,
+        email: contact.contact.email,
+        phone: contact.contact.phone
+      }));
+
+      callback(null, {
+        contacts: mappedContacts
+      });
+    } catch (error) {
+      logger.error('Error getting user contacts:', error);
+
+      callback({
+        code: grpc.status.INTERNAL,
+        message: 'Internal server error'
+      });
+    }
+  }
+
   public async addContactToUser(
     call: grpc.ServerUnaryCall<userServiceGrpc.AddContactRequest, userServiceGrpc.AddContactResponse>,
     callback: grpc.sendUnaryData<userServiceGrpc.AddContactResponse>

@@ -20,6 +20,15 @@ export class UserRepository {
     });
   }
 
+  public async getUserContacts(userId: string) {
+    return this.prisma.trustedContact.findMany({
+      where: { userId },
+      include: {
+        contact: true
+      }
+    });
+  }
+
   public async getUserByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { email }
