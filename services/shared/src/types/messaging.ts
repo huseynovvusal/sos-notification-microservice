@@ -3,4 +3,13 @@ type AuthEmailMessage = {
   receiverName: string;
 };
 
-export type { AuthEmailMessage };
+type SOSMessage = {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  message: string;
+};
+
+export type { AuthEmailMessage, SOSMessage };

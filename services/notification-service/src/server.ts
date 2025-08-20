@@ -6,6 +6,7 @@ import { config } from '@/config';
 import { Channel, ChannelModel } from 'amqplib';
 import { connectToRabbitMQ } from './messaging/connection';
 import { consumeAuthEmailMessages } from './messaging/email.consumer';
+import { consumeSOSNotificationMessages } from './messaging/sos-notification.consumer';
 
 const grpcServer = new grpc.Server();
 
@@ -33,11 +34,13 @@ async function setupRabbitMQ(): Promise<void> {
 
   rabbitMQConnection = connection;
   rabbitMQChannel = channel;
+
+  consumeAuthEmailMessages(rabbitMQChannel);
+  consumeSOSNotificationMessages(rabbitMQChannel);
 }
 
 async function initialize() {
   await setupRabbitMQ();
-  consumeAuthEmailMessages(rabbitMQChannel);
 
   setupGrpcServer();
 }
