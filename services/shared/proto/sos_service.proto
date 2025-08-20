@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package sos_service;
+
+service SOSService {
+    rpc StartSOSReuqest(StartSOSRequest) returns (StartSOSResponse);
+}
+
+message StartSOSRequest {
+    string user_id = 1; 
+    string message = 2; 
+}
+
+message StartSOSResponse {
+    bool success = 1; 
+}
