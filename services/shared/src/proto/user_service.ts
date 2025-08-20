@@ -39,6 +39,14 @@ export interface GetUserResponse {
   user: UserMessage | undefined;
 }
 
+export interface GetUserContactsRequest {
+  userId: string;
+}
+
+export interface GetUserContactsResponse {
+  contacts: ContactMessage[];
+}
+
 export interface AddContactRequest {
   userId: string;
   contactEmail: string;
@@ -337,6 +345,126 @@ export const GetUserResponse: MessageFns<GetUserResponse> = {
     message.user = (object.user !== undefined && object.user !== null)
       ? UserMessage.fromPartial(object.user)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseGetUserContactsRequest(): GetUserContactsRequest {
+  return { userId: "" };
+}
+
+export const GetUserContactsRequest: MessageFns<GetUserContactsRequest> = {
+  encode(message: GetUserContactsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== "") {
+      writer.uint32(10).string(message.userId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUserContactsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUserContactsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetUserContactsRequest {
+    return { userId: isSet(object.userId) ? globalThis.String(object.userId) : "" };
+  },
+
+  toJSON(message: GetUserContactsRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetUserContactsRequest>, I>>(base?: I): GetUserContactsRequest {
+    return GetUserContactsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetUserContactsRequest>, I>>(object: I): GetUserContactsRequest {
+    const message = createBaseGetUserContactsRequest();
+    message.userId = object.userId ?? "";
+    return message;
+  },
+};
+
+function createBaseGetUserContactsResponse(): GetUserContactsResponse {
+  return { contacts: [] };
+}
+
+export const GetUserContactsResponse: MessageFns<GetUserContactsResponse> = {
+  encode(message: GetUserContactsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.contacts) {
+      ContactMessage.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUserContactsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUserContactsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.contacts.push(ContactMessage.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetUserContactsResponse {
+    return {
+      contacts: globalThis.Array.isArray(object?.contacts)
+        ? object.contacts.map((e: any) => ContactMessage.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: GetUserContactsResponse): unknown {
+    const obj: any = {};
+    if (message.contacts?.length) {
+      obj.contacts = message.contacts.map((e) => ContactMessage.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetUserContactsResponse>, I>>(base?: I): GetUserContactsResponse {
+    return GetUserContactsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetUserContactsResponse>, I>>(object: I): GetUserContactsResponse {
+    const message = createBaseGetUserContactsResponse();
+    message.contacts = object.contacts?.map((e) => ContactMessage.fromPartial(e)) || [];
     return message;
   },
 };
@@ -849,6 +977,17 @@ export const UserServiceService = {
     responseSerialize: (value: GetUserResponse): Buffer => Buffer.from(GetUserResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): GetUserResponse => GetUserResponse.decode(value),
   },
+  getUserContacts: {
+    path: "/user_service.UserService/GetUserContacts",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetUserContactsRequest): Buffer =>
+      Buffer.from(GetUserContactsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetUserContactsRequest => GetUserContactsRequest.decode(value),
+    responseSerialize: (value: GetUserContactsResponse): Buffer =>
+      Buffer.from(GetUserContactsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetUserContactsResponse => GetUserContactsResponse.decode(value),
+  },
   addContactToUser: {
     path: "/user_service.UserService/AddContactToUser",
     requestStream: false,
@@ -873,6 +1012,7 @@ export const UserServiceService = {
 export interface UserServiceServer extends UntypedServiceImplementation {
   createUser: handleUnaryCall<CreateUserRequest, CreateUserResponse>;
   getUserById: handleUnaryCall<GetUserByIdRequest, GetUserResponse>;
+  getUserContacts: handleUnaryCall<GetUserContactsRequest, GetUserContactsResponse>;
   addContactToUser: handleUnaryCall<AddContactRequest, AddContactResponse>;
   removeContactFromUser: handleUnaryCall<RemoveContactRequest, RemoveContactResponse>;
 }
@@ -907,6 +1047,21 @@ export interface UserServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: GetUserResponse) => void,
+  ): ClientUnaryCall;
+  getUserContacts(
+    request: GetUserContactsRequest,
+    callback: (error: ServiceError | null, response: GetUserContactsResponse) => void,
+  ): ClientUnaryCall;
+  getUserContacts(
+    request: GetUserContactsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetUserContactsResponse) => void,
+  ): ClientUnaryCall;
+  getUserContacts(
+    request: GetUserContactsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetUserContactsResponse) => void,
   ): ClientUnaryCall;
   addContactToUser(
     request: AddContactRequest,

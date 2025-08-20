@@ -7,6 +7,8 @@ service UserService {
 
     rpc GetUserById(GetUserByIdRequest) returns (GetUserResponse);
 
+    rpc GetUserContacts(GetUserContactsRequest) returns (GetUserContactsResponse);
+
     rpc AddContactToUser(AddContactRequest) returns (AddContactResponse);
 
     rpc RemoveContactFromUser(RemoveContactRequest) returns (RemoveContactResponse);
@@ -28,6 +30,14 @@ message GetUserByIdRequest {
 
 message GetUserResponse {
     UserMessage user = 1;
+}
+
+message GetUserContactsRequest {
+    string userId = 1;
+}
+
+message GetUserContactsResponse {
+    repeated ContactMessage contacts = 1;
 }
 
 message AddContactRequest {

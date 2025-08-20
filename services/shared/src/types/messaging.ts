@@ -9,6 +9,10 @@ type SOSMessage = {
     name: string;
     email: string;
   };
+  contact: {
+    phone: string;
+    email: string;
+  };
   message: string;
 };
 
