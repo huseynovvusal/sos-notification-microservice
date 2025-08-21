@@ -3,6 +3,7 @@ import { sosServiceGrpc, userServiceGrpc } from '@sos-notification-microservice/
 import { userServiceClient } from './user-service-client';
 import { produceSOSNotificationMessage } from '@/messaging/sos-notification.producer';
 import { rabbitMQChannel } from '@/messaging/connection';
+import logger from '@/lib/logger';
 
 class SOSService {
   public async startSOS(
@@ -39,7 +40,7 @@ class SOSService {
     const contactResponse: userServiceGrpc.GetUserContactsResponse = await new Promise((resolve, reject) => {
       userServiceClient.getUserContacts({ userId }, (error, response) => {
         if (error) {
-          console.error('Error fetching user contacts:', error);
+          logger.error('Error fetching user contacts:', error);
           reject({
             code: error.code,
             message: error.message
@@ -81,4 +82,4 @@ class SOSService {
   }
 }
 
-export const sosServie = new SOSService();
+export const sosService = new SOSService();

@@ -3,11 +3,13 @@ import * as grpc from '@grpc/grpc-js';
 import logger from '@/lib/logger';
 import { config } from '@/config';
 import { connectRabbitMQ, rabbitMQChannel, rabbitMQConnection } from './messaging/connection';
+import { sosServiceGrpc } from '@sos-notification-microservice/shared';
+import { sosServiceImplementation } from './grpc/sos-service-impl';
 
 const grpcServer = new grpc.Server();
 
 function setupGrpcServer(): grpc.Server {
-  // grpcServer.addService();
+  grpcServer.addService(sosServiceGrpc.SOSServiceService, sosServiceImplementation);
 
   const grpcHost = config.GRPC_HOST;
   const grpcPort = config.GRPC_PORT;

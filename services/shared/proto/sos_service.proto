@@ -3,7 +3,7 @@ syntax = "proto3";
 package sos_service;
 
 service SOSService {
-    rpc StartSOSReuqest(StartSOSRequest) returns (StartSOSResponse);
+    rpc StartSOS(StartSOSRequest) returns (StartSOSResponse);
 }
 
 message StartSOSRequest {

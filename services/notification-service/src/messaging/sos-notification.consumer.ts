@@ -1,3 +1,4 @@
+import { sendEmail } from '@/helpers/email.helpers';
 import logger from '@/lib/logger';
 import { messaging, SOSMessage } from '@sos-notification-microservice/shared';
 import { Channel } from 'amqplib';
@@ -18,12 +19,12 @@ function consumeSOSNotificationMessages(channel: Channel) {
     }
 
     const sosMessage: SOSMessage = JSON.parse(message.content.toString());
-    const { user, message: sosText } = sosMessage;
+    const { user, contact, message: sosText } = sosMessage;
 
     try {
       logger.debug(`Received SOS notification message: ${user.email}, (${user.name}) - ${sosText}`);
 
-      //TODO: Implement the logic to handle the SOS notification, e.g., send an email, SMS, or push notification
+      await sendEmail(contact.email, 'SOS Notification', `SOS Alert by ${user.name} (${user.email}): ${sosText}`);
 
       channel.ack(message);
     } catch (error) {

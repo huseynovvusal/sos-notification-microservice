@@ -16,32 +16,48 @@ export class AuthService {
   ) {
     const { name, phone, email, password } = call.request;
 
-    let createUserResponse: userServiceGrpc.CreateUserResponse = await new Promise((resolve, reject) => {
-      userServiceClient.createUser({ name, phone, email }, (err, response) => {
-        if (err) {
-          logger.error('Error creating user:', err);
+    let createUserResponse: userServiceGrpc.CreateUserResponse;
 
-          reject({
-            code: err.code,
-            details: err.message
+    try {
+      createUserResponse = await new Promise((resolve, reject) => {
+        userServiceClient.createUser({ name, phone, email }, (err, response) => {
+          if (err) {
+            logger.error('Error creating user:', err);
+
+            return reject({
+              code: err.code,
+              message: err.message
+            });
+          }
+
+          produceAuthEmailMessage(rabbitMQChannel, {
+            receiverEmail: email,
+            receiverName: name
           });
-        }
 
-        produceAuthEmailMessage(rabbitMQChannel, {
-          receiverEmail: email,
-          receiverName: name
+          resolve(response);
         });
-
-        resolve(response);
       });
-    });
+    } catch (error: any) {
+      return callback({
+        code: error.code,
+        message: error.message
+      });
+    }
+
+    if (!createUserResponse.user) {
+      return callback({
+        code: grpc.status.INTERNAL,
+        details: 'Failed to create user'
+      });
+    }
 
     logger.debug('User created successfully', JSON.stringify(createUserResponse, null, 2));
 
     const hashedPassword = await this.hashPassword(password);
 
     const auth = await Auth.create({
-      userId: createUserResponse?.user?.id,
+      userId: createUserResponse.user.id,
       email,
       passwordHash: hashedPassword
     });

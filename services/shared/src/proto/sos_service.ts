@@ -166,8 +166,8 @@ export const StartSOSResponse: MessageFns<StartSOSResponse> = {
 
 export type SOSServiceService = typeof SOSServiceService;
 export const SOSServiceService = {
-  startSosReuqest: {
-    path: "/sos_service.SOSService/StartSOSReuqest",
+  startSos: {
+    path: "/sos_service.SOSService/StartSOS",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: StartSOSRequest): Buffer => Buffer.from(StartSOSRequest.encode(value).finish()),
@@ -178,20 +178,20 @@ export const SOSServiceService = {
 } as const;
 
 export interface SOSServiceServer extends UntypedServiceImplementation {
-  startSosReuqest: handleUnaryCall<StartSOSRequest, StartSOSResponse>;
+  startSos: handleUnaryCall<StartSOSRequest, StartSOSResponse>;
 }
 
 export interface SOSServiceClient extends Client {
-  startSosReuqest(
+  startSos(
     request: StartSOSRequest,
     callback: (error: ServiceError | null, response: StartSOSResponse) => void,
   ): ClientUnaryCall;
-  startSosReuqest(
+  startSos(
     request: StartSOSRequest,
     metadata: Metadata,
     callback: (error: ServiceError | null, response: StartSOSResponse) => void,
   ): ClientUnaryCall;
-  startSosReuqest(
+  startSos(
     request: StartSOSRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
