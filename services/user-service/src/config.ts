@@ -7,22 +7,43 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 dotenv.config({ quiet: true, path: path.join(__dirname, `../.env${NODE_ENV === 'development' ? '.development' : ''}`) });
 
 export class Config {
-  public NODE_ENV: string | undefined;
-  public PORT: number | undefined;
-
-  public GRPC_HOST: string | undefined;
-  public GRPC_PORT: number | undefined;
-
-  public MONGO_URI: string | undefined;
+  public NODE_ENV: string;
+  public PORT: number;
+  public GRPC_HOST: string;
+  public GRPC_PORT: number;
+  public MONGO_URI: string;
+  public EUREKA_HOST: string;
+  public EUREKA_PORT: number;
+  public EUREKA_SERVICE_NAME: string = process.env.EUREKA_SERVICE_NAME || 'user-service';
 
   constructor() {
-    this.NODE_ENV = process.env.NODE_ENV;
-    this.PORT = process.env.PORT ? Number(process.env.PORT) : undefined;
+    this.NODE_ENV = process.env.NODE_ENV || 'development';
+    this.PORT = this.getNumberEnv('PORT');
+    this.GRPC_HOST = this.getStringEnv('GRPC_HOST');
+    this.GRPC_PORT = this.getNumberEnv('GRPC_PORT');
+    this.MONGO_URI = this.getStringEnv('MONGO_URI');
+    this.EUREKA_HOST = this.getStringEnv('EUREKA_HOST');
+    this.EUREKA_PORT = this.getNumberEnv('EUREKA_PORT');
+  }
 
-    this.GRPC_HOST = process.env.GRPC_HOST;
-    this.GRPC_PORT = process.env.GRPC_PORT ? Number(process.env.GRPC_PORT) : undefined;
+  private getStringEnv(key: string): string {
+    const value = process.env[key];
+    if (!value) {
+      throw new Error(`Environment variable ${key} is required but not set`);
+    }
+    return value;
+  }
 
-    this.MONGO_URI = process.env.MONGO_URI;
+  private getNumberEnv(key: string): number {
+    const value = process.env[key];
+    if (!value) {
+      throw new Error(`Environment variable ${key} is required but not set`);
+    }
+    const numberValue = Number(value);
+    if (isNaN(numberValue)) {
+      throw new Error(`Environment variable ${key} must be a number`);
+    }
+    return numberValue;
   }
 }
 

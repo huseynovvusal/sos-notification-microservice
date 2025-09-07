@@ -3,7 +3,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: sos_postgres_container
     ports:
       - "5432:5432"
     environment:
@@ -16,7 +16,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin_container
+    container_name: sos_pgadmin_container
     ports:
       - "5050:80"
     environment:
@@ -33,7 +33,7 @@ services:
 
   mongo:
     image: mongo:latest
-    container_name: mongo_container
+    container_name: sos_mongo_container
     ports:
       - "27017:27017"
     volumes:
@@ -43,7 +43,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: redis_container
+    container_name: sos_redis_container
     ports:
       - "6379:6379"
     networks:
@@ -51,7 +51,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:management
-    container_name: rabbitmq_container
+    container_name: sos_rabbitmq_container
     ports:
       - "5672:5672"
       - "15672:15672"
