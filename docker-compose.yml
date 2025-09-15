@@ -58,28 +58,26 @@ services:
     networks:
       - backend-network
 
-  # user-service:
-  #   build:
-  #     context: ./server/user-service
-  #     dockerfile: Dockerfile.dev
-  #   container_name: user_service_container
-  #   # restart: always
-  #   ports:
-  #     - "3001:3001"
-  #   depends_on:
-  #     - mongo
-  #     - redis
-  #     - rabbitmq
-  #   env_file:
-  #     - ./server/user-service/.env.development
-  #   environment:
-  #     - MONGO_URI=mongodb://mongo:27017/user
-  #   volumes:
-  #     - ./server/user-service:/app
-  #     - ./server/proto:/proto
-  #     - /app/node_modules
-  #   networks:
-  #     - backend_network
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile.dev
+    container_name: user_service_container
+    # restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+    env_file:
+      - ./services/user-service/.env.development
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/user
+    volumes:
+      - ./services/user-service:/app
+    networks:
+      - backend-network
 
   # auth-service:
   #   build:

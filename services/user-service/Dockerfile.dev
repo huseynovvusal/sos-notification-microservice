@@ -2,12 +2,10 @@ FROM node:18 AS builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y protobuf-compiler
+RUN apt-get update
 
 COPY package*.json ./
 RUN npm install
-
-RUN npm run generate-proto
 
 FROM node:18-slim
 
