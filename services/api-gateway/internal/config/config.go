@@ -8,6 +8,8 @@ import (
 
 type Config struct {
 	Port string
+
+	AuthServiceAddress string
 }
 
 func Load() (*Config, error) {
@@ -20,7 +22,13 @@ func Load() (*Config, error) {
 		port = "8080"
 	}
 
+	authServiceAddress := os.Getenv("AUTH_SERVICE_ADDRESS")
+	if authServiceAddress == "" {
+		authServiceAddress = "localhost:50051"
+	}
+
 	return &Config{
-		Port: port,
+		Port:               port,
+		AuthServiceAddress: authServiceAddress,
 	}, nil
 }

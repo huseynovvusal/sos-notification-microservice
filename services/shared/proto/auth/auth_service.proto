@@ -26,3 +26,5 @@ message LoginRequest {
 message LoginResponse {
     string accessToken = 1;
 }
+
+option go_package = "/auth";

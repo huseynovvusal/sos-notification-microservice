@@ -18,3 +18,4 @@ message LocationStreamResponse {
   bool success = 1;
 }
 
+option go_package = "/notification";

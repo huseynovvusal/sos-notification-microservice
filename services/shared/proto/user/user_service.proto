@@ -71,3 +71,5 @@ message ContactMessage {
     string email = 3;
     string phone = 4;
 }
+
+option go_package = "/user";
