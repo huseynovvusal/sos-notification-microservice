@@ -5,19 +5,17 @@ import (
 	"sos-notification-microservice/api-gateway/internal/interfaces"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 // TODO: Inject logger and use it for logging
+// TODO: Add validation for request payloads
 type AuthHandler struct {
 	authService interfaces.AuthService
-	validator   *validator.Validate
 }
 
-func NewAuthHandler(authService interfaces.AuthService, validator *validator.Validate) *AuthHandler {
+func NewAuthHandler(authService interfaces.AuthService) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
-		validator:   validator,
 	}
 }
 
@@ -30,11 +28,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	if err := h.validator.Struct(&req); err != nil {
-		// h.logger.Errorf("Validation error: %v", err)
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
+	// if err := h.validator.Struct(&req); err != nil {
+	// 	// h.logger.Errorf("Validation error: %v", err)
+	// 	c.JSON(400, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
 	res, err := h.authService.Register(c.Request.Context(), &req)
 	if err != nil {

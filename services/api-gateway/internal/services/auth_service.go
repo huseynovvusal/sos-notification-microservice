@@ -51,3 +51,7 @@ func (c *authClient) Register(ctx context.Context, req *dto.RegisterRequest) (*d
 		AccessToken: res.AccessToken,
 	}, nil
 }
+
+func (c *authClient) Close() error {
+	return c.conn.Close()
+}
