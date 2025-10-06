@@ -1,15 +1,17 @@
 package middleware
 
 import (
-	"log"
+	"sos-notification-microservice/api-gateway/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Logging() gin.HandlerFunc {
+	logger := utils.NewLogger("info")
+
 	return func(c *gin.Context) {
-		log.Printf("Request: %s %s", c.Request.Method, c.Request.URL.Path)
+		logger.Infof("Request: %s %s", c.Request.Method, c.Request.URL.Path)
 		c.Next()
-		log.Printf("Response: %d", c.Writer.Status())
+		logger.Infof("Response: %d", c.Writer.Status())
 	}
 }
