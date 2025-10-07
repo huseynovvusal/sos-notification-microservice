@@ -14,9 +14,13 @@ type Logger struct {
 func NewLogger(level string) *Logger {
 	logger := logrus.New()
 	logger.SetOutput(os.Stdout)
-	logger.SetFormatter(&logrus.JSONFormatter{
-		TimestampFormat: time.RFC3339Nano,
-		PrettyPrint:     true,
+	logger.SetFormatter(&logrus.TextFormatter{
+		ForceColors:            true,
+		FullTimestamp:          true,
+		TimestampFormat:        time.RFC3339,
+		PadLevelText:           true,
+		DisableLevelTruncation: true,
+		DisableQuote:           true,
 	})
 
 	lvl, err := logrus.ParseLevel(level)

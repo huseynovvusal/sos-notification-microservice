@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,6 +9,7 @@ import (
 	"sos-notification-microservice/api-gateway/internal/handler"
 	"sos-notification-microservice/api-gateway/internal/middleware"
 	"sos-notification-microservice/api-gateway/internal/services"
+	"sos-notification-microservice/api-gateway/internal/utils"
 	"syscall"
 	"time"
 
@@ -17,18 +17,21 @@ import (
 )
 
 func main() {
+
+	logger := utils.NewLogger("info")
+
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		logger.Fatalf("Failed to load config: %v", err)
 	}
 
 	authService, err := services.NewAuthService(cfg.AuthServiceAddress)
 	if err != nil {
-		log.Fatalf("Failed to connect to AuthService: %v", err)
+		logger.Fatalf("Failed to connect to AuthService: %v", err)
 	}
 	defer func() {
 		if err := authService.Close(); err != nil {
-			log.Printf("Failed to close AuthService connection: %v", err)
+			logger.Errorf("Failed to close AuthService connection: %v", err)
 		}
 	}()
 
@@ -53,10 +56,10 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("Starting server on port %s", cfg.Port)
+		logger.Infof("Starting server on port %s", cfg.Port)
 
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			logger.Fatalf("Could not listen on port %s: %v", cfg.Port, err)
 		}
 	}()
 
@@ -64,15 +67,15 @@ func main() {
 
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutting down server...")
+	logger.Info("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		logger.Fatalf("Server forced to shutdown: %v", err)
 	}
 
-	log.Println("Server shut down gracefully")
+	logger.Info("Server exiting")
 
 }
