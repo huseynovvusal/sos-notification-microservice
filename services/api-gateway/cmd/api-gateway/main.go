@@ -35,11 +35,12 @@ func main() {
 		}
 	}()
 
-	authHandler := handler.NewAuthHandler(authService)
+	authHandler := handler.NewAuthHandler(authService, logger)
 
 	// Router setup with middleware
 	router := gin.New()
 	router.Use(middleware.Logging())
+	router.Use(middleware.ErrorHandler(logger))
 
 	// API versioning
 	v1 := router.Group("/api/v1")
@@ -55,6 +56,7 @@ func main() {
 		Handler: router,
 	}
 
+	// Start server in a separate
 	go func() {
 		logger.Infof("Starting server on port %s", cfg.Port)
 
