@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"sos-notification-microservice/api-gateway/internal/config"
+	"sos-notification-microservice/api-gateway/internal/dto"
 	"sos-notification-microservice/api-gateway/internal/handler"
 	"sos-notification-microservice/api-gateway/internal/middleware"
 	"sos-notification-microservice/api-gateway/internal/services"
@@ -47,7 +48,9 @@ func main() {
 	{
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/register", authHandler.Register)
+			auth.POST("/register",
+				middleware.ValidateEndpoint[dto.RegisterRequest](),
+				authHandler.Register)
 		}
 	}
 
